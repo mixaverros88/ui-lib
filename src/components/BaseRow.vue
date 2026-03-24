@@ -14,6 +14,6 @@ const props = defineProps({
 })
 
 function computeCss() {
-  return 'block p-6 border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 global ' + props.bgColor;
+  return 'block p-8 border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700 ' + props.bgColor;
 }
 </script>
