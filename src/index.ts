@@ -1,6 +1,7 @@
 // Components
 export { default as BaseAlert } from './components/BaseAlert.vue'
 export { default as BaseBadge } from './components/BaseBadge.vue'
+export { default as BaseBreadcrumb } from './components/BaseBreadcrumb.vue'
 export { default as BaseButton } from './components/BaseButton.vue'
 export { default as BaseLine } from './components/BaseLine.vue'
 export { default as BaseLogo } from './components/BaseLogo.vue'
@@ -24,6 +25,9 @@ export { BaseToastEnum } from './enums/BaseToastEnum'
 export { ColorsEnums } from './enums/ColorsEnums'
 export { LineEnum } from './enums/LineEnum'
 export { PositioningEnum } from './enums/PositioningEnum'
+
+// Types
+export type { BreadCrumb } from './components/BaseBreadcrumb.vue'
 
 // Utils
 export { getBaseColor, getBaseColorOf } from './utils/util'
