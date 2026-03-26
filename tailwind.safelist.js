@@ -1,11 +1,14 @@
 /**
- * MGV-Backoffice Tailwind Safelist
+ * MGV-Backoffice Tailwind Safelist (Tailwind v3 — LEGACY)
  *
- * Some components in this library build Tailwind classes dynamically
- * (e.g. "bg-" + color + "-100"), which means the Tailwind compiler
- * can't detect them at build time and will purge them.
+ * ⚠️  DEPRECATED: If you are using Tailwind CSS v4+, use the CSS-based
+ *    safelist instead:
  *
- * Import this file in your consuming project's tailwind.config.js:
+ *    In your main CSS file:
+ *      @import "tailwindcss";
+ *      @import "mgv-backoffice/tailwind.safelist.css";
+ *
+ * For Tailwind v3 projects, import this file in your tailwind.config.js:
  *
  *   const mgvSafelist = require('mgv-backoffice/tailwind.safelist')
  *
@@ -289,4 +292,4 @@ const safelist = [
 ]
 
 // Deduplicate
-module.exports = [...new Set(safelist)]
+export default [...new Set(safelist)]

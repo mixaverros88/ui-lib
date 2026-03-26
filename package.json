@@ -1,23 +1,26 @@
 {
   "name": "mgv-backoffice",
-  "version": "1.0.8",
+  "version": "1.0.13",
   "description": "Shared Vue 3 UI component library",
-  "main": "./dist/ui-lib.umd.js",
-  "module": "./dist/ui-lib.mjs",
+  "type": "module",
+  "main": "./dist/ui-lib.umd.cjs",
+  "module": "./dist/ui-lib.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/ui-lib.mjs",
-      "require": "./dist/ui-lib.umd.js",
+      "import": "./dist/ui-lib.js",
+      "require": "./dist/ui-lib.umd.cjs",
       "types": "./dist/index.d.ts"
     },
     "./dist/style.css": "./dist/style.css",
-    "./tailwind.safelist": "./tailwind.safelist.js"
+    "./tailwind.safelist": "./tailwind.safelist.js",
+    "./tailwind.safelist.css": "./tailwind.safelist.css"
   },
   "files": [
     "dist",
     "src",
-    "tailwind.safelist.js"
+    "tailwind.safelist.js",
+    "tailwind.safelist.css"
   ],
   "scripts": {
     "build": "vite build",
@@ -33,6 +36,8 @@
     "vue-router": "^4.6.4",
     "@heroicons/vue": "^2.2.0",
     "@vitejs/plugin-vue": "^5.2.0",
+    "@tailwindcss/vite": "^4.1.0",
+    "tailwindcss": "^4.1.0",
     "vite": "^5.4.0",
     "vite-plugin-dts": "^4.5.0",
     "typescript": "^5.9.3",
