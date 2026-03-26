@@ -1,3 +1,5 @@
+import './style.css'
+
 // Components
 export { default as BaseAlert } from './components/BaseAlert.vue'
 export { default as BaseBadge } from './components/BaseBadge.vue'
@@ -10,6 +12,7 @@ export { default as BaseRow } from './components/BaseRow.vue'
 export { default as BaseSpinner } from './components/BaseSpinner.vue'
 export { default as BaseToast } from './components/BaseToast.vue'
 export { default as ColoredSquares } from './components/ColoredSquares.vue'
+export { default as EarningsCard } from './components/EarningsCard.vue'
 export { default as EuroAmount } from './components/EuroAmount.vue'
 export { default as Pagination } from './components/Pagination.vue'
 export { default as TrendArrow } from './components/TrendArrow.vue'

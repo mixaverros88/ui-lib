@@ -21,7 +21,8 @@ const props = defineProps({
   },
   color: {
     type: Object as PropType<AlertEnum>,
-    required: false
+    required: false,
+    default: AlertEnum.ERROR
   }
 })
 

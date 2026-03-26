@@ -38,7 +38,7 @@ const props = defineProps({
     required: false
   },
   type: {
-    type: String,
+    type: String as () => 'button' | 'submit' | 'reset',
     required: false,
     default: 'button'
   },
