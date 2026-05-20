@@ -1,5 +1,5 @@
 export enum BaseButtonSizeEnum {
-    EXTRA_SMALL = "EXTRA SMALL",
+    EXTRA_SMALL = "EXTRA_SMALL",
     SMALL = "SMALL",
     BASE = "BASE",
     LARGE = "LARGE",

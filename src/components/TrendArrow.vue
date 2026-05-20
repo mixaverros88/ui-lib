@@ -1,5 +1,5 @@
 <template>
-  <div v-if="number">
+  <div v-if="number !== null && number !== undefined">
     <span v-if="isNegative" class="flex items-center space-x-2">
       <BaseBadge :color="ColorsEnums.RED">{{ number }}{{ props.icon }}</BaseBadge>
       <ArrowDownIcon class="h-5 w-5 text-red-500" />

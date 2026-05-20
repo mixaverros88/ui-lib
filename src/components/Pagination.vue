@@ -1,8 +1,8 @@
 <template>
   <div>
     <ul>
-      <li v-for="cell in cells" :key="cell">
-        <a v-if="cell!==0" @click="changePage(cell)" :class="{ active: cell === currentPage }">{{ cell }}</a>
+      <li v-for="(cell, index) in cells" :key="index">
+        <a v-if="cell!==0" role="button" tabindex="0" @click="changePage(cell)" @keydown.enter="changePage(cell)" :class="{ active: cell === currentPage }">{{ cell }}</a>
         <span v-if="cell===0" style="cursor: not-allowed;">...</span>
       </li>
     </ul>
@@ -15,8 +15,7 @@ import { ref, watch } from "vue";
 const props = defineProps({
   totalItems: {
     type: Number,
-    required: true,
-    default: 10
+    required: true
   },
   itemsPerPage: {
     type: Number,
@@ -43,13 +42,15 @@ function changePage(pageNumber: number) {
       cells.value.push(0);
     }
 
-    for (let i = 2; i >= 1; i--) {
+    for (let i = 1; i <= 2; i++) {
       let previousCell = pageNumber - i;
       if (previousCell > 0) {
         cells.value.push(previousCell);
       }
     }
 
+    // Sort previous pages in ascending order
+    const currentIdx = cells.value.length;
     cells.value.push(currentPage.value);
 
     let nextPages = totalPages.value - pageNumber;
@@ -87,7 +88,7 @@ watch(() => props.totalItems, () => {
       cells.value.push(i);
     }
   }
-})
+}, { immediate: true })
 </script>
 
 <style lang="scss" scoped>

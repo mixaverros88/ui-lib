@@ -10,7 +10,7 @@ function getBaseColor(c: AlertEnum): string {
         case (AlertEnum.SUCCESS):
             color = "green"
             break;
-        case (AlertEnum.INFROM):
+        case (AlertEnum.INFO):
             color = "gray"
             break;
         case (AlertEnum.WARNING):
@@ -37,6 +37,14 @@ function getBaseColorOf(c: ColorsEnums): string {
         }
         case ColorsEnums.YELLOW: {
             color = 'yellow';
+            break;
+        }
+        case ColorsEnums.BLACK: {
+            color = 'black';
+            break;
+        }
+        case ColorsEnums.GRAY: {
+            color = 'gray';
             break;
         }
         case ColorsEnums.NONE: {

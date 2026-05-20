@@ -1,5 +1,5 @@
 <template>
-<div v-if="isLoading" id="toast-top-right" :class="computeMainComponentCss()" role="alert">
+<div v-if="isVisible" id="toast-top-right" :class="computeMainComponentCss()" role="alert">
 
   <div class="flex items-center w-full max-w-md p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800">
     <div v-if="mode == BaseToastEnum.ERROR" :class="computeModeCss()">
@@ -21,7 +21,7 @@
       <span class="sr-only">Close</span>
       <XMarkIcon
           class="h-6 w-6 text-gray-500 cursor-pointer"
-          @click="isLoading = !isLoading"
+          @click="close"
       />
     </button>
   </div>
@@ -31,7 +31,7 @@
 
 <script lang="ts" setup>
 import { ExclamationCircleIcon, CheckCircleIcon, ExclamationTriangleIcon, XMarkIcon } from '@heroicons/vue/24/outline';
-import { ref, PropType } from "vue";
+import { ref, onMounted, onUnmounted, PropType } from "vue";
 import { BaseToastEnum } from "../enums/BaseToastEnum";
 import { PositioningEnum } from "../enums/PositioningEnum";
 
@@ -52,34 +52,63 @@ const props = defineProps({
   positioning: {
     type: String,
     required: false,
-    default: 'right'
+    default: PositioningEnum.TOP_RIGHT
+  },
+  duration: {
+    type: Number,
+    required: false,
+    default: 5000
+  }
+})
+
+const isVisible = ref(true);
+let timer: ReturnType<typeof setTimeout> | null = null;
+
+function close() {
+  isVisible.value = false;
+  if (timer) {
+    clearTimeout(timer);
+    timer = null;
+  }
+}
+
+onMounted(() => {
+  timer = setTimeout(() => isVisible.value = false, props.duration);
+})
+
+onUnmounted(() => {
+  if (timer) {
+    clearTimeout(timer);
   }
 })
 
 function computeModeCss() {
-  let basePositioning = "";
+  let modeCss = "";
   switch (props.mode) {
     case (BaseToastEnum.ERROR):
-      basePositioning = "text-red-500 bg-red-100 dark:bg-red-800 dark:text-red-200"
+      modeCss = "text-red-500 bg-red-100 dark:bg-red-800 dark:text-red-200"
       break;
     case (BaseToastEnum.SUCCESS):
-      basePositioning = "text-green-500 bg-green-100 dark:bg-green-800 dark:text-green-200"
+      modeCss = "text-green-500 bg-green-100 dark:bg-green-800 dark:text-green-200"
       break;
     case (BaseToastEnum.WARNING):
-      basePositioning = "text-orange-500 bg-orange-100 dark:bg-orange-700 dark:text-orange-200"
+      modeCss = "text-orange-500 bg-orange-100 dark:bg-orange-700 dark:text-orange-200"
+      break;
+    default:
+      modeCss = "text-gray-500 bg-gray-100 dark:bg-gray-800 dark:text-gray-200"
       break;
   }
-  return 'inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg ' + basePositioning;
+  return 'inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg ' + modeCss;
 }
 
 function computeMainComponentCss() {
   let basePositioning = "top-5 right-5";
   switch (props.positioning) {
     case (PositioningEnum.BOTTOM_LEFT):
-      basePositioning = "bottom-5"
+      basePositioning = "bottom-5 left-5"
       break;
     case (PositioningEnum.TOP_LEFT):
-      basePositioning = "top-5"
+      basePositioning = "top-5 left-5"
       break;
     case (PositioningEnum.TOP_RIGHT):
       basePositioning = "top-5 right-5"
@@ -88,14 +117,6 @@ function computeMainComponentCss() {
       basePositioning = "bottom-5 right-5"
       break;
   }
-  return 'fixed flex items-center w-full max-w-md p-4 space-x-4 divide-x rounded-lg ' + basePositioning + ' space-x';
+  return 'fixed flex items-center w-full max-w-md p-4 space-x-4 divide-x rounded-lg ' + basePositioning;
 }
-
-const isLoading = ref(true);
-
-function disable() {
-  setTimeout(() => isLoading.value = false, 1000000);
-}
-
-disable()
 </script>
