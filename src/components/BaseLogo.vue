@@ -5,22 +5,22 @@
 </template>
 
 <script lang="ts" setup>
-import { BaseLoginEnum } from "../enums/BaseLogoEnum";
+import { BaseLogoEnum } from "../enums/BaseLogoEnum";
 
 const props = defineProps({
   size: {
     type: String,
     required: false,
-    default: BaseLoginEnum.MEDIUM
+    default: BaseLogoEnum.MEDIUM
   }
 })
 
 function computePx() {
   let commonCss = ''
   switch (props.size) {
-    case BaseLoginEnum.SMALL: { commonCss = '50px'; break; }
-    case BaseLoginEnum.MEDIUM: { commonCss = '100px'; break; }
-    case BaseLoginEnum.LARGE: { commonCss = '150px'; break; }
+    case BaseLogoEnum.SMALL: { commonCss = '50px'; break; }
+    case BaseLogoEnum.MEDIUM: { commonCss = '100px'; break; }
+    case BaseLogoEnum.LARGE: { commonCss = '150px'; break; }
   }
   return commonCss;
 }

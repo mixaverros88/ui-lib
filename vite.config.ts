@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     dts({
       insertTypesEntry: true,
-      include: ['src/**/*.ts', 'src/**/*.vue'],
+      include: ['src/**/*.ts', 'src/**/*.vue', 'env.d.ts'],
     }),
   ],
   build: {
@@ -19,7 +19,7 @@ export default defineConfig({
       name: 'UiLib',
       fileName: 'ui-lib',
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: ['vue', 'vue-router', '@heroicons/vue/24/outline', '@heroicons/vue/24/solid'],
       output: {
         globals: {

@@ -1,12 +1,17 @@
 <template>
   <div class="outside" @click="$emit('closeModal')"></div>
 
-  <div class="dialog relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+  <div
+    class="dialog relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+    role="dialog"
+    aria-modal="true"
+    :aria-labelledby="'modal-title-' + title"
+  >
 
     <div v-if="mode === BaseModalEnum.DELETE" class="p-6 text-center">
       <ExclamationCircleIcon class="w-12 h-12 text-gray-400 mx-auto mb-4" />
 
-      <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+      <h3 :id="'modal-title-' + title" class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
         Are you sure you want to delete this {{ title }}?
       </h3>
 
@@ -20,11 +25,12 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted, onUnmounted } from 'vue';
 import { BaseModalEnum } from "../enums/BaseModalEnum";
 import { BaseButtonEnum } from "../enums/BaseButtonEnum";
 import { ExclamationCircleIcon } from '@heroicons/vue/24/outline'
 
-defineEmits(['closeModal', 'confirmModal'])
+const emit = defineEmits(['closeModal', 'confirmModal'])
 
 const props = defineProps({
   title: {
@@ -43,9 +49,23 @@ const props = defineProps({
   mode: {
     type: String,
     required: false,
-    default: 'SUCCESS'
+    default: BaseModalEnum.SUCCESS
   }
 });
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') {
+    emit('closeModal');
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown);
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown);
+})
 </script>
 
 <style lang="scss" scoped>

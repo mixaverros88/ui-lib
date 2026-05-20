@@ -57,7 +57,8 @@ const crumbs = computed<BreadCrumb[]>(() => {
   return segments.map(segment => {
     accumulated += '/' + segment
 
-    const name = !Number(segment)
+    const isNumeric = !Number.isNaN(Number(segment))
+    const name = !isNumeric
       ? (segment.charAt(0).toUpperCase() + segment.slice(1)).replaceAll('-', ' ')
       : segment
 

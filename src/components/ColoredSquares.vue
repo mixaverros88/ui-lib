@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref } from 'vue'
 import { ColorsEnums } from "../enums/ColorsEnums";
 
 const props = defineProps({
@@ -33,9 +33,7 @@ const pastelColors = [
   'bg-pink-300'
 ]
 
-const bgColor = computed(() => {
-  return pastelColors[Math.floor(Math.random() * pastelColors.length)]
-})
+const bgColor = ref(pastelColors[Math.floor(Math.random() * pastelColors.length)])
 
 function computeCss() {
   let color = 'gray';

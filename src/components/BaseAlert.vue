@@ -17,10 +17,10 @@ const props = defineProps({
   title: {
     type: String,
     required: false,
-    default: AlertEnum.ERROR
+    default: ''
   },
   color: {
-    type: Object as PropType<AlertEnum>,
+    type: String as PropType<AlertEnum>,
     required: false,
     default: AlertEnum.ERROR
   }
