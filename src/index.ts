@@ -26,6 +26,9 @@ export { default as BaseNotFoundPage } from './components/BaseNotFoundPage.vue'
 export { default as BaseSidebar } from './components/BaseSidebar.vue'
 export { default as BaseEntityPickerModal } from './components/BaseEntityPickerModal.vue'
 export { default as BaseAppLayout } from './components/BaseAppLayout.vue'
+export { default as BasePageHeader } from './components/BasePageHeader.vue'
+export { default as BaseToolbarButton } from './components/BaseToolbarButton.vue'
+export { default as BaseActionButton } from './components/BaseActionButton.vue'
 
 // Composables
 export { useTheme } from './composables/useTheme'
@@ -62,3 +65,15 @@ export {
   statusBadgeSolid,
   statusBadgeTinted,
 } from './utils/httpColors'
+export { sanitizeHtml, isSafeHref } from './utils/sanitizeHtml'
+export {
+  fmtNumber,
+  fmtDate,
+  fmtDateTime,
+  fmtDateShort,
+  fmtPrice,
+  fmtPct,
+  fmtUsd,
+} from './utils/format'
+export { computePnL } from './utils/pnl'
+export type { PnL, PnLInputs } from './utils/pnl'

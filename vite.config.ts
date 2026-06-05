@@ -16,6 +16,7 @@ export default defineConfig({
       // index.d.ts at the path package.json's `types` field points to.
       entryRoot: 'src',
       include: ['src/**/*.ts', 'src/**/*.vue', 'env.d.ts'],
+      exclude: ['src/**/*.{test,spec}.ts'],
     }),
   ],
   build: {

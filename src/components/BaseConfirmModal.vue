@@ -25,6 +25,13 @@
       {{ message }}
     </p>
 
+    <!--
+      Optional extra content rendered below the message — e.g. a warning
+      banner or an opt-in checkbox the caller wants the user to see before
+      confirming. Empty for the common confirm/cancel case.
+    -->
+    <slot />
+
     <template #footer>
       <button
         type="button"

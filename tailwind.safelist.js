@@ -97,6 +97,23 @@ const safelist = [
   'hover:bg-purple-800',
   'focus:ring-purple-300',
   'bg-purple-400',
+  // EMERALD/SKY/AMBER/GRAY (filled) + outline + ghost variants
+  'bg-emerald-600', 'hover:bg-emerald-700', 'focus:ring-emerald-300', 'bg-emerald-400',
+  'bg-sky-600', 'hover:bg-sky-700', 'focus:ring-sky-300', 'bg-sky-400',
+  'bg-amber-500', 'hover:bg-amber-600', 'focus:ring-amber-300', 'bg-amber-300',
+  'bg-gray-600', 'hover:bg-gray-700',
+  'border', 'bg-transparent', 'opacity-50', 'opacity-60', 'cursor-pointer',
+  // outline tones
+  ...['blue', 'green', 'emerald', 'sky', 'red', 'amber', 'yellow', 'purple'].flatMap(c => [
+    `text-${c}-700`, `border-${c}-300`, `hover:bg-${c}-50`,
+    `text-${c}-400`, `border-${c}-500/40`, `hover:bg-${c}-500/10`,
+  ]),
+  // ghost tones (light 500/600 text, dark 300/400 text)
+  ...['blue', 'green', 'emerald', 'sky', 'yellow', 'purple'].flatMap(c => [`text-${c}-600`]),
+  'text-red-500', 'text-amber-300',
+  'hover:bg-gray-100',
+  'text-gray-700', 'border-gray-300', 'hover:bg-gray-50',
+  'text-gray-500', 'text-gray-400', 'text-gray-300', 'border-gray-600', 'hover:bg-gray-800',
   // Dynamic: switch on size
   'px-5',
   'py-2.5',
@@ -226,10 +243,19 @@ const safelist = [
   'text-green-500',
 
   // ── BaseSpinner ────────────────────────────────────────────
-  'border-2',
+  'w-4', 'h-4', 'w-6', 'h-6', 'w-8', 'h-8', 'w-12', 'h-12',
+  'border-2', 'border-4',
   'border-gray-200',
-  'border-t-blue-500',
+  'rounded-full',
   'animate-spin',
+  'border-t-blue-500',
+  'border-t-emerald-500',
+  'border-t-sky-500',
+  'border-t-indigo-500',
+  'border-t-teal-500',
+  'border-t-purple-500',
+  'border-t-red-500',
+  'border-t-amber-500',
 
   // ── BaseRow ────────────────────────────────────────────────
   'block',

@@ -148,7 +148,9 @@ Button with color, size, loading state, and Vue Router integration.
 | Prop          | Type                                | Default               | Description                          |
 | ------------- | ----------------------------------- | --------------------- | ------------------------------------ |
 | `description` | `String`                            | **required**          | Button label text                    |
-| `color`       | `String`                            | `BaseButtonEnum.BLUE` | Color variant                        |
+| `color`       | `String`                            | `BaseButtonEnum.BLUE` | Color variant (`BLUE`/`WHITE`/`DARK`/`GREEN`/`EMERALD`/`RED`/`YELLOW`/`PURPLE`/`SKY`/`GRAY`/`AMBER`) |
+| `outline`     | `Boolean`                           | `false`               | Outlined/secondary style — transparent fill, coloured text + border, tinted hover (theme-aware) |
+| `ghost`       | `Boolean`                           | `false`               | Ghost/borderless style — no border or fill, coloured text + tinted hover (theme-aware). For compact toolbar/action buttons |
 | `to`          | `String`                            | —                     | Vue Router path (renders `<router-link>`) |
 | `type`        | `'button' \| 'submit' \| 'reset'`  | `'button'`            | HTML button type                     |
 | `icon`        | `String`                            | —                     | Right-side icon name                 |
@@ -173,6 +175,14 @@ Button with color, size, loading state, and Vue Router integration.
     :color="BaseButtonEnum.RED"
     :size="BaseButtonSizeEnum.SMALL"
   />
+  <!-- Outlined / secondary -->
+  <BaseButton description="Import" :color="BaseButtonEnum.EMERALD" outline iconLeft>
+    <ArrowUpTrayIcon class="w-4 h-4 mr-1.5" />
+  </BaseButton>
+  <!-- Ghost / borderless toolbar action -->
+  <BaseButton description="Logs" :color="BaseButtonEnum.SKY" ghost iconLeft :size="BaseButtonSizeEnum.SMALL">
+    <ClipboardDocumentListIcon class="w-4 h-4 mr-1.5" />
+  </BaseButton>
 </template>
 
 <script setup lang="ts">
@@ -305,15 +315,25 @@ import { BaseRow } from 'mgv-backoffice'
 
 ### BaseSpinner
 
-Simple animated loading spinner.
+Animated loading spinner — a neutral ring with a coloured leading arc.
 
-**Props:** None
+**Props:**
+
+| Prop    | Type                                                                       | Default  | Description                                                  |
+|---------|----------------------------------------------------------------------------|----------|-------------------------------------------------------------|
+| `size`  | `'sm' \| 'md' \| 'lg' \| 'xl'`                                              | `'sm'`   | Diameter + ring thickness — 16 / 24 / 32 / 48px.            |
+| `color` | `'blue' \| 'emerald' \| 'sky' \| 'indigo' \| 'teal' \| 'purple' \| 'red' \| 'amber'` | `'blue'` | Colour of the spinning arc. The track stays neutral gray.   |
+
+With no props it renders the original 16px blue spinner, so existing call sites are unaffected.
 
 **Example:**
 
 ```vue
 <template>
+  <!-- legacy default -->
   <BaseSpinner />
+  <!-- larger, themed -->
+  <BaseSpinner size="lg" color="emerald" />
 </template>
 
 <script setup lang="ts">
@@ -393,6 +413,7 @@ Earnings summary card with formatted currency display.
 | `subtitle` | `String` | `'Lifetime commission'` | Subheading text      |
 | `badge`    | `String` | `''`                    | Optional badge label |
 | `currency` | `String` | `'$'`                   | Currency symbol      |
+| `decimals` | `Number` | `2`                     | Fraction digits shown for the amount |
 
 **Example:**
 
@@ -532,7 +553,7 @@ import {
 
 | Enum                 | Values                                                        |
 | -------------------- |---------------------------------------------------------------|
-| `AlertEnum`          | `WARNING`, `ERROR`, `SUCCESS`, `INFROM`                       |
+| `AlertEnum`          | `WARNING`, `ERROR`, `SUCCESS`, `INFO`                         |
 | `BaseBadgeEnum`      | `WIN`, `LOSE`                                                 |
 | `BaseButtonEnum`     | `RED`, `BLUE`, `WHITE`, `DARK`, `GREEN`, `YELLOW`, `PURPLE`   |
 | `BaseButtonSizeEnum` | `EXTRA_SMALL`, `SMALL`, `BASE`, `LARGE`, `EXTRA_LARGE`        |
@@ -548,12 +569,14 @@ import {
 ## Types
 
 ```ts
-import type { BreadCrumb } from 'mgv-backoffice'
+import type { BreadCrumb, PnL, PnLInputs } from 'mgv-backoffice'
 ```
 
 | Type         | Shape                                  |
 | ------------ | -------------------------------------- |
 | `BreadCrumb` | `{ name: string; url: string }`        |
+| `PnLInputs`  | `{ buyPrice; lastPrice; filledQty }` (each `number \| string \| null \| undefined`) |
+| `PnL`        | `{ pnlUsd: number \| null; pnlPct: number \| null }` |
 
 ---
 
@@ -583,6 +606,86 @@ Tailwind class helpers for HTTP method and status code badges. `Solid` variants
 return saturated `bg-*-600` classes for use on neutral surfaces; `Bright` /
 `Tinted` variants return softer combinations suitable for cards. `statusBadgeTinted`
 takes `(status, isDark)` to adapt between themes.
+
+### HTML sanitizer
+
+```ts
+import { sanitizeHtml, isSafeHref } from 'mgv-backoffice'
+```
+
+| Function       | Signature                                       | Returns |
+| -------------- | ----------------------------------------------- | ------- |
+| `sanitizeHtml` | `(raw: string \| undefined \| null) => string`  | Allow-list–sanitised HTML safe for `v-html`. |
+| `isSafeHref`   | `(value: string) => boolean`                    | `true` if the href uses a safe scheme (http/https/mailto/tel, root-relative, or anchor). |
+
+Allow-list sanitizer for strings bound into `v-html`. Keeps a small set of
+formatting tags (`a`, `b`/`strong`, `i`/`em`, `code`, `pre`, `p`, `ul`/`ol`/`li`,
+`span`, `div`, `br`), strips all other elements (unwrapping to text, or dropping
+content entirely for `script`/`style`/`iframe`/etc.), removes every attribute
+except `href`/`title` on anchors, rejects unsafe href schemes
+(`javascript:`/`data:`/`vbscript:`/`file:`), and hardens surviving links with
+`rel="noopener noreferrer" target="_blank"`. Browser-only (uses `DOMParser`).
+
+```ts
+sanitizeHtml('<p>Hi<script>alert(1)<\/script></p>') // '<p>Hi</p>'
+```
+
+### Display formatters
+
+```ts
+import {
+  fmtNumber,
+  fmtDate,
+  fmtDateTime,
+  fmtDateShort,
+  fmtPrice,
+  fmtPct,
+  fmtUsd,
+} from 'mgv-backoffice'
+```
+
+Locale-aware, pure, dependency-free formatters for tables, logs and charts.
+They handle missing/non-finite input gracefully (rendering an em-dash) so raw
+API values can be passed without pre-sanitising.
+
+| Function       | Signature                                                       | Returns |
+| -------------- | --------------------------------------------------------------- | ------- |
+| `fmtNumber`    | `(n: number \| string \| null \| undefined, digits = 4) => string` | Fixed-fraction number; em-dash for null/undefined/non-finite. Accepts numeric strings. |
+| `fmtDate`      | `(s: string \| number \| null \| undefined) => string`          | Locale date-time from ISO string or epoch; em-dash on empty, raw value on parse failure. |
+| `fmtDateTime`  | `(ms: number) => string`                                        | Compact `"Mon D, HH:MM"` label from epoch-millis (chart axes/tooltips). |
+| `fmtDateShort` | `(ms: number) => string`                                        | Short `"Mon D"` calendar label from epoch-millis. |
+| `fmtPrice`     | `(n: number) => string`                                         | Price with precision that scales to magnitude (more decimals for sub-cent values). |
+| `fmtPct`       | `(n: number, digits = 2) => string`                             | Percentage with explicit sign, e.g. `"+2.50%"`. |
+| `fmtUsd`       | `(v: number) => string`                                         | Signed USD amount with leading sign, e.g. `"+$5.00"`. |
+
+### Profit & loss
+
+```ts
+import { computePnL } from 'mgv-backoffice'
+import type { PnL, PnLInputs } from 'mgv-backoffice'
+```
+
+| Function     | Signature                       | Returns |
+| ------------ | ------------------------------- | ------- |
+| `computePnL` | `(row: PnLInputs) => PnL`       | Unrealised mark-to-market PnL in absolute USD and percent. Returns `{ pnlUsd: null, pnlPct: null }` when any input is missing, non-finite, or `buyPrice <= 0`. |
+
+```ts
+interface PnLInputs {
+  buyPrice: number | string | null | undefined
+  lastPrice: number | string | null | undefined
+  filledQty: number | string | null | undefined
+}
+
+interface PnL {
+  pnlUsd: number | null
+  pnlPct: number | null
+}
+```
+
+```ts
+computePnL({ buyPrice: 100, lastPrice: 110, filledQty: 5 })
+// { pnlUsd: 50, pnlPct: 10 }
+```
 
 ---
 
@@ -730,6 +833,129 @@ Drop-in 404 view.
 
 **Props:** `code` (`'404'`), `message` (`'Page not found'`),
 `homeRouteName` (`'home'`), `homeLabel` (`'Go home'`).
+
+### BasePageHeader
+
+Page-level header: icon badge + title/subtitle on the left, action
+buttons on the right. Gives top-level views a consistent header shape
+and width.
+
+**Props:**
+
+| Prop            | Type     | Default       | Description |
+| --------------- | -------- | ------------- | ----------- |
+| `title`         | `String` | **required**  | H1 text. |
+| `subtitle`      | `String` | `''`          | Muted line below the title. |
+| `iconColor`     | `String` | `'emerald'`   | Badge + icon colour: `'emerald' \| 'sky' \| 'red' \| 'amber'`. |
+| `maxWidthClass` | `String` | `'max-w-4xl'` | Tailwind max-w utility constraining header width. |
+
+**Slots:**
+
+| Slot      | Slot props        | Description |
+| --------- | ----------------- | ----------- |
+| `icon`    | `{ iconClass }`   | Page Heroicon. Bind `:class="iconClass"` for the theme-aware colour. |
+| `actions` | —                 | Buttons rendered on the right (refresh, destructive, etc.). |
+
+```vue
+<template>
+  <BasePageHeader title="Request Journal" subtitle="Recent matched requests" icon-color="sky">
+    <template #icon="{ iconClass }">
+      <DocumentTextIcon class="w-5 h-5" :class="iconClass" />
+    </template>
+    <template #actions>
+      <BaseButton description="Refresh" @click="reload" />
+    </template>
+  </BasePageHeader>
+</template>
+
+<script setup lang="ts">
+import { BasePageHeader, BaseButton } from 'mgv-backoffice'
+import { DocumentTextIcon } from '@heroicons/vue/24/outline'
+</script>
+```
+
+---
+
+### BaseToolbarButton
+
+Bordered toolbar button — the "Refresh / Delete All" row that sits under
+a page header. Optional leading icon (via slot) plus a label.
+
+**Props:**
+
+| Prop       | Type      | Default     | Description |
+| ---------- | --------- | ----------- | ----------- |
+| `label`    | `String`  | `''`        | Button text. Omit for an icon-only button. |
+| `variant`  | `String`  | `'neutral'` | `'neutral'` (grey) or `'danger'` (solid red). |
+| `disabled` | `Boolean` | `false`     | Greys out and blocks the click. |
+| `title`    | `String`  | `undefined` | Native tooltip / a11y text. |
+| `type`     | `String`  | `'button'`  | Native button type. |
+
+**Slots:**
+
+| Slot   | Slot props      | Description |
+| ------ | --------------- | ----------- |
+| `icon` | `{ iconClass }` | Leading Heroicon. Bind `:class="iconClass"` (`w-4 h-4`); add state classes as needed. |
+
+**Emits:** `click` (native `MouseEvent`).
+
+```vue
+<template>
+  <BaseToolbarButton label="Refresh" :disabled="isLoading" title="Refresh" @click="reload">
+    <template #icon="{ iconClass }">
+      <ArrowPathIcon :class="[iconClass, { 'animate-spin': isLoading }]" />
+    </template>
+  </BaseToolbarButton>
+  <BaseToolbarButton label="Delete All" variant="danger" @click="deleteAll">
+    <template #icon="{ iconClass }">
+      <TrashIcon :class="iconClass" />
+    </template>
+  </BaseToolbarButton>
+</template>
+```
+
+---
+
+### BaseActionButton
+
+Compact ghost action button — the colour-coded "Edit / Logs / Stub /
+Delete" actions on a card footer or action row. No border/fill at rest;
+a tinted hover background keyed to the semantic colour.
+
+**Props:**
+
+| Prop        | Type      | Default     | Description |
+| ----------- | --------- | ----------- | ----------- |
+| `label`     | `String`  | `''`        | Button text. Omit for an icon-only button. |
+| `color`     | `String`  | `'emerald'` | `'emerald' \| 'sky' \| 'indigo' \| 'teal' \| 'purple' \| 'red' \| 'amber' \| 'amberStrong'`. |
+| `disabled`  | `Boolean` | `false`     | Dims via opacity and suppresses the hover tint. |
+| `fullWidth` | `Boolean` | `false`     | Stretch to fill its flex row (`flex-1`). |
+| `title`     | `String`  | `undefined` | Native tooltip. |
+| `ariaLabel` | `String`  | `undefined` | Accessible label. |
+| `type`      | `String`  | `'button'`  | Native button type. |
+
+**Slots:**
+
+| Slot   | Slot props      | Description |
+| ------ | --------------- | ----------- |
+| `icon` | `{ iconClass }` | Leading Heroicon. Bind `:class="iconClass"` (`w-4 h-4`). |
+
+**Emits:** `click` (native `MouseEvent`).
+
+```vue
+<template>
+  <BaseActionButton label="Edit" color="emerald" full-width title="Edit this mock" @click="edit">
+    <template #icon="{ iconClass }">
+      <PencilSquareIcon :class="iconClass" />
+    </template>
+  </BaseActionButton>
+  <BaseActionButton label="Delete" color="red" @click="remove">
+    <template #icon="{ iconClass }">
+      <TrashIcon :class="iconClass" />
+    </template>
+  </BaseActionButton>
+</template>
+```
 
 ---
 
