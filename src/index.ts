@@ -29,6 +29,7 @@ export { default as BaseAppLayout } from './components/BaseAppLayout.vue'
 export { default as BasePageHeader } from './components/BasePageHeader.vue'
 export { default as BaseToolbarButton } from './components/BaseToolbarButton.vue'
 export { default as BaseActionButton } from './components/BaseActionButton.vue'
+export { default as BaseCopyButton } from './components/BaseCopyButton.vue'
 
 // Composables
 export { useTheme } from './composables/useTheme'

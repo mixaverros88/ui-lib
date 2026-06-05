@@ -21,7 +21,7 @@
 
     <!-- Loading -->
     <div v-if="loading" class="mt-4 flex justify-center py-6">
-      <BaseSpinner />
+      <BaseSpinner color="emerald" />
     </div>
 
     <!-- Error -->

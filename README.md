@@ -777,8 +777,10 @@ aria-modal. Compose this rather than building modals from scratch.
 | `title`         | `String`  | **required** | Modal heading. |
 | `maxWidthClass` | `String`  | `'max-w-md'` | Tailwind max-w utility for the card. |
 | `manualClose`   | `Boolean` | `false`     | If true, backdrop click and Escape do NOT auto-emit `cancel`. |
+| `scrollable`    | `Boolean` | `false`     | Switch to the large-content layout: a flex column capped at `90vh` with a fixed header/footer and a scrolling body. |
+| `subtitle`      | `String`  | `''`        | Muted line under the title (scrollable layout only). |
 
-**Slots:** `icon`, `default`, `footer`.
+**Slots:** `icon`, `default`, `footer`, and (scrollable layout) `header-actions` — content on the right of the header, e.g. a close button.
 **Events:** `cancel`, `backdrop`.
 
 ### BaseConfirmModal
@@ -955,6 +957,46 @@ a tinted hover background keyed to the semantic colour.
     </template>
   </BaseActionButton>
 </template>
+```
+
+---
+
+### BaseCopyButton
+
+Copy-to-clipboard icon button with transient "copied" feedback — clicks
+write `text` to the clipboard, swap the clipboard icon for a checkmark
+for `resetMs`, then revert. Uses the async Clipboard API with a
+hidden-textarea `execCommand` fallback for insecure origins. Emits
+`copied` / `error` so the parent can fire its own toast.
+
+**Props:**
+
+| Prop        | Type      | Default   | Description |
+| ----------- | --------- | --------- | ----------- |
+| `text`      | `String`  | **required** | Value written to the clipboard. |
+| `label`     | `String`  | `''`      | Used in the tooltip / aria-label (`Copy {label}`). |
+| `variant`   | `String`  | `'ghost'` | `'ghost'` (borderless `p-1` icon) or `'bordered'` (`w-9 h-9` boxed, turns emerald while copied). |
+| `resetMs`   | `Number`  | `1500`    | How long the checkmark stays before reverting. |
+| `iconClass` | `String`  | `'w-4 h-4'` | Icon size class. |
+
+**Emits:** `copied`, `error(err)`.
+
+```vue
+<template>
+  <!-- Inline ID copy, parent fires the toast -->
+  <BaseCopyButton
+    :text="stub.id"
+    label="Stub ID"
+    @copied="showToastMessage('Stub ID copied to clipboard', BaseToastEnum.SUCCESS)"
+    @error="showToastMessage('Failed to copy stub ID', BaseToastEnum.ERROR)"
+  />
+  <!-- Boxed copy next to a read-only input -->
+  <BaseCopyButton :text="mock.id" label="Mock ID" variant="bordered" :reset-ms="2000" />
+</template>
+
+<script setup lang="ts">
+import { BaseCopyButton, BaseToastEnum } from 'mgv-backoffice'
+</script>
 ```
 
 ---

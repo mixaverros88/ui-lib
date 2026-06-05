@@ -23,7 +23,45 @@
       :aria-labelledby="titleId"
       @click="onBackdrop"
     >
+      <!--
+        Scrollable layout — for large content modals. A flex column
+        capped at 90vh: header and footer stay fixed (`shrink-0`) while
+        the body scrolls (`overflow-y-auto flex-1`). Supports a subtitle
+        and a `header-actions` slot (e.g. a close button) on the right.
+      -->
       <div
+        v-if="scrollable"
+        class="relative w-full mx-4 rounded-lg shadow-xl max-h-[90vh] flex flex-col"
+        :class="[maxWidthClass, shellClass]"
+        @click.stop
+      >
+        <div class="flex items-start justify-between gap-4 p-6 border-b shrink-0" :class="t.border">
+          <div class="flex items-start gap-4 min-w-0">
+            <slot name="icon" />
+            <div class="flex-1 min-w-0">
+              <h3 :id="titleId" class="text-lg font-medium" :class="t.primaryText">
+                {{ title }}
+              </h3>
+              <p v-if="subtitle" class="text-sm mt-1 break-all" :class="t.mutedText">
+                {{ subtitle }}
+              </p>
+            </div>
+          </div>
+          <slot name="header-actions" />
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-1">
+          <slot />
+        </div>
+
+        <div v-if="$slots.footer" class="flex gap-3 justify-end p-6 border-t shrink-0" :class="t.border">
+          <slot name="footer" />
+        </div>
+      </div>
+
+      <!-- Compact layout (default) — small centered dialog. -->
+      <div
+        v-else
         class="relative w-full mx-4 rounded-lg shadow-xl"
         :class="[maxWidthClass, shellClass]"
         @click.stop
@@ -78,11 +116,25 @@ interface Props {
    * `backdrop` / handle their own Escape.
    */
   manualClose?: boolean
+  /**
+   * Switches to the scrollable layout — a flex column capped at 90vh
+   * with a fixed header/footer and a scrolling body. Use for large
+   * content modals (request detail, import preview, …) rather than the
+   * compact confirm-style default.
+   */
+  scrollable?: boolean
+  /**
+   * Optional muted line under the title. Only rendered in the
+   * scrollable layout.
+   */
+  subtitle?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   maxWidthClass: 'max-w-md',
   manualClose: false,
+  scrollable: false,
+  subtitle: '',
 })
 
 const emit = defineEmits<{

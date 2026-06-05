@@ -1,6 +1,6 @@
 {
   "name": "mgv-backoffice",
-  "version": "1.13.0",
+  "version": "1.16.0",
   "description": "Shared Vue 3 UI component library",
   "type": "module",
   "main": "./dist/ui-lib.umd.cjs",
