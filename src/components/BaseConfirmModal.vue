@@ -21,9 +21,17 @@
       </div>
     </template>
 
-    <p class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
-      {{ message }}
-    </p>
+    <!--
+      Default renders the plain `message` string. Callers that need rich
+      text (bold names, inline code, etc.) can override the `message` slot
+      and render their own markup — the `message` prop is still used as the
+      accessible/fallback text and by callers that don't override.
+    -->
+    <slot name="message">
+      <p class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+        {{ message }}
+      </p>
+    </slot>
 
     <!--
       Optional extra content rendered below the message — e.g. a warning

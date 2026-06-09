@@ -19,8 +19,14 @@
         'max-w-4xl'.
   -->
   <div :class="['mx-auto px-4 sm:px-6', maxWidthClass]">
-    <div class="flex items-center justify-between mb-8">
-      <div class="flex items-center gap-3">
+    <!--
+      flex-wrap + gap so a long title and the action buttons reflow onto
+      separate rows on narrow (mobile) viewports instead of the actions
+      overflowing off the right edge of the screen. min-w-0 on the title
+      group lets a long title truncate rather than shoving the actions out.
+    -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+      <div class="flex items-center gap-3 min-w-0">
         <div
           class="w-10 h-10 rounded-lg flex items-center justify-center"
           :class="badgeBgClass"
