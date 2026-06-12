@@ -32,7 +32,7 @@ export { default as BaseActionButton } from './components/BaseActionButton.vue'
 export { default as BaseCopyButton } from './components/BaseCopyButton.vue'
 
 // Composables
-export { useTheme } from './composables/useTheme'
+export { useTheme, initTheme } from './composables/useTheme'
 export type { UseThemeOptions } from './composables/useTheme'
 export { useThemeClasses } from './composables/useThemeClasses'
 export type { ThemeClasses } from './composables/useThemeClasses'

@@ -24,6 +24,7 @@ const colorMap: Record<string, string> = {
   [ColorsEnums.BLUE]:   'bg-blue-100 text-blue-700 border-blue-200',
   [ColorsEnums.YELLOW]: 'bg-yellow-100 text-yellow-700 border-yellow-200',
   [ColorsEnums.GRAY]:   'bg-gray-100 text-gray-700 border-gray-200',
+  [ColorsEnums.BLACK]:  'bg-gray-800 text-gray-100 border-gray-700',
   [ColorsEnums.NONE]:   'bg-gray-50 text-gray-600 border-gray-200',
 }
 

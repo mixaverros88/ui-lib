@@ -39,6 +39,10 @@ Or include the pre-built CSS safelist:
 @import 'mgv-backoffice/tailwind.safelist.css';
 ```
 
+> Maintainers: `tailwind.safelist.js` is the single source of truth.
+> `tailwind.safelist.css` is generated from it via `npm run safelist`
+> (runs automatically before `npm run build`) — don't edit it by hand.
+
 ---
 
 ## Components
@@ -153,9 +157,7 @@ Button with color, size, loading state, and Vue Router integration.
 | `ghost`       | `Boolean`                           | `false`               | Ghost/borderless style — no border or fill, coloured text + tinted hover (theme-aware). For compact toolbar/action buttons |
 | `to`          | `String`                            | —                     | Vue Router path (renders `<router-link>`) |
 | `type`        | `'button' \| 'submit' \| 'reset'`  | `'button'`            | HTML button type                     |
-| `icon`        | `String`                            | —                     | Right-side icon name                 |
-| `iconSize`    | `String`                            | —                     | Icon size class                      |
-| `iconLeft`    | `String`                            | —                     | Left-side icon name                  |
+| `iconLeft`    | `Boolean`                           | `false`               | Render the slot icon before the label |
 | `isRounded`   | `Boolean`                           | —                     | Fully rounded corners                |
 | `isDisable`   | `Boolean`                           | —                     | Disabled state                       |
 | `size`        | `String`                            | —                     | Size variant (use `BaseButtonSizeEnum`) |
@@ -243,7 +245,14 @@ import { BaseLogo, BaseLoginEnum } from 'mgv-backoffice'
 
 ### BaseModal
 
-Confirmation dialog with support for delete and success modes.
+> ⚠️ **Deprecated.** Prefer [`BaseConfirmModal`](#baseconfirmmodal) for confirm/cancel
+> flows or [`BaseModalShell`](#basemodalshell) for custom dialogs — they support dark
+> mode, teleport to `<body>`, and slot-based composition. Kept for backward
+> compatibility.
+
+Confirmation dialog with support for delete and success modes. `DELETE` mode renders
+the confirm/cancel pair; any other mode renders the title, optional `description`,
+the default slot, and a single OK button that emits `closeModal`.
 
 **Props:**
 
@@ -514,8 +523,8 @@ Up/down trend indicator displayed as a colored badge.
 
 | Prop     | Type     | Default | Description                                          |
 | -------- | -------- | ------- |------------------------------------------------------|
-| `number` | `Number` | —       | Positive = green arrow up, negative = red arrow down |
-| `icon`   | `String` | —       | Optional icon override                               |
+| `number` | `Number` | —       | Positive = green arrow up, negative = red arrow down, zero = neutral gray dash |
+| `icon`   | `String` | —       | Optional suffix appended after the number (e.g. `"%"`) |
 
 **Example:**
 
@@ -523,6 +532,7 @@ Up/down trend indicator displayed as a colored badge.
 <template>
   <TrendArrow :number="12.5" />   <!-- Green up arrow -->
   <TrendArrow :number="-3.2" />   <!-- Red down arrow -->
+  <TrendArrow :number="0" />      <!-- Neutral gray dash -->
 </template>
 
 <script setup lang="ts">
@@ -1005,6 +1015,7 @@ import { BaseCopyButton, BaseToastEnum } from 'mgv-backoffice'
 
 ```ts
 import {
+  initTheme,
   useTheme,
   useThemeClasses,
   useEscapeKey,
@@ -1016,7 +1027,8 @@ import {
 
 | Composable | Purpose |
 | ---------- | ------- |
-| `useTheme({ storageKey? })` | Singleton dark/light controller. Toggles `<html class="dark">` and persists via localStorage (default key `'mgv-theme'`). Consumers should call once at app entry with their app-specific storage key. |
+| `initTheme({ storageKey? })` | Explicitly initialize the theme singleton. Call in your app entry point **before mounting** when you need a custom storage key — library components call `useTheme()` internally, so a component mounting first would otherwise lock in the default key (a dev-mode warning fires if that happens). |
+| `useTheme({ storageKey? })` | Singleton dark/light controller. Toggles `<html class="dark">` and persists via localStorage (default key `'mgv-theme'`). Prefer `initTheme` at app entry for custom keys. |
 | `useThemeClasses()` | Named Tailwind class roles for dark/light (card, border, primaryText, mutedText, dimText, input, ghostButton, emeraldText, redText, …). Returns computed refs auto-unwrapped in templates. |
 | `useEscapeKey(handler)` | Component-scoped Escape key listener. |
 | `useDebouncedRef(source, delay?)` | Debounced mirror of a ref. Timer cleared on scope dispose. |

@@ -24,7 +24,19 @@ let initialized = false
 let configuredStorageKey = 'mgv-theme'
 
 function initialize(storageKey: string) {
-  if (initialized) return
+  if (initialized) {
+    // A different key after initialization means the app configured the
+    // theme too late (a library component mounted first and locked in the
+    // default). Surface it instead of silently ignoring the option.
+    if (storageKey !== configuredStorageKey) {
+      console.warn(
+        `[ui-lib] useTheme: storage key "${storageKey}" ignored — theme already `
+        + `initialized with "${configuredStorageKey}". Call initTheme({ storageKey }) `
+        + `before mounting any component.`,
+      )
+    }
+    return
+  }
   initialized = true
   configuredStorageKey = storageKey
 
@@ -53,6 +65,16 @@ function initialize(storageKey: string) {
       )
     })
   }
+}
+
+/**
+ * Explicitly initialize the theme singleton. Call this in the app's entry
+ * point (before mounting) when you need a custom storage key — library
+ * components call useTheme() internally, so waiting until a view calls
+ * useTheme({ storageKey }) risks a component locking in the default first.
+ */
+export function initTheme(options?: UseThemeOptions): void {
+  initialize(options?.storageKey ?? configuredStorageKey)
 }
 
 export function useTheme(options?: UseThemeOptions) {

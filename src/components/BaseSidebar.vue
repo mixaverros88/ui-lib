@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, nextTick, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { useTheme } from '../composables/useTheme'
@@ -51,14 +51,6 @@ watch(mobileOpen, async (open) => {
     lastFocusedBeforeOpen = null
   }
 })
-
-onMounted(() => {
-  // The visibility-change health-check hook that lived in WireMate's
-  // AppSidebar was application-specific; consumers can wire any
-  // periodic work in the `#status` slot themselves.
-})
-
-onUnmounted(() => {})
 
 function goHome() {
   router.push({ name: props.homeRouteName })

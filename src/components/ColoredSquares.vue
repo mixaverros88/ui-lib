@@ -36,14 +36,15 @@ const pastelColors = [
 const bgColor = ref(pastelColors[Math.floor(Math.random() * pastelColors.length)])
 
 function computeCss() {
+  const base = "font-bold text-xs mr-2 px-2.5 py-0.5 rounded-full";
   let color = 'gray';
   switch (props.color) {
     case ColorsEnums.GREEN: { color = 'green'; break; }
     case ColorsEnums.RED: { color = 'red'; break; }
     case ColorsEnums.BLUE: { color = 'blue'; break; }
     case ColorsEnums.YELLOW: { color = 'yellow'; break; }
-    case ColorsEnums.NONE: { color = ''; break; }
+    case ColorsEnums.NONE: { return base; }
   }
-  return "font-bold bg-" + color + "-100 text-" + color + "-800 text-xs mr-2 px-2.5 py-0.5 rounded-full";
+  return base + " bg-" + color + "-100 text-" + color + "-800";
 }
 </script>

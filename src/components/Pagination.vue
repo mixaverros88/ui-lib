@@ -1,9 +1,17 @@
 <template>
   <div>
-    <ul>
-      <li v-for="(cell, index) in cells" :key="index">
-        <a v-if="cell!==0" role="button" tabindex="0" @click="changePage(cell)" @keydown.enter="changePage(cell)" :class="{ active: cell === currentPage }">{{ cell }}</a>
-        <span v-if="cell===0" style="cursor: not-allowed;">...</span>
+    <ul class="flex list-none p-0 m-0">
+      <li v-for="(cell, index) in cells" :key="index" class="mr-1">
+        <a
+          v-if="cell !== 0"
+          role="button"
+          tabindex="0"
+          @click="changePage(cell)"
+          @keydown.enter="changePage(cell)"
+          class="inline-block border border-gray-300 rounded-lg p-3 no-underline text-black cursor-pointer hover:bg-gray-300"
+          :class="{ 'active font-bold bg-gray-200': cell === currentPage }"
+        >{{ cell }}</a>
+        <span v-else class="inline-block border border-gray-300 rounded-lg p-3 text-black cursor-not-allowed">...</span>
       </li>
     </ul>
   </div>
@@ -28,110 +36,47 @@ const totalPages = ref(0);
 const cells = ref([] as number[]);
 const emit = defineEmits(['page-changed']);
 
+// Rebuild the visible cells around `page`. A cell value of 0 renders as
+// an ellipsis. The window is the current page ± 2 neighbours, plus the
+// first/last page with an ellipsis only when pages are actually hidden.
+function buildCells(page: number) {
+  if (totalPages.value <= 5) {
+    cells.value = Array.from({ length: totalPages.value }, (_, i) => i + 1);
+    return;
+  }
+
+  const out: number[] = [];
+  const start = Math.max(1, page - 2);
+  const end = Math.min(totalPages.value, page + 2);
+
+  if (start > 1) {
+    out.push(1);
+    if (start > 2) out.push(0);
+  }
+  for (let i = start; i <= end; i++) {
+    out.push(i);
+  }
+  if (end < totalPages.value) {
+    if (end < totalPages.value - 1) out.push(0);
+    out.push(totalPages.value);
+  }
+  cells.value = out;
+}
+
 function changePage(pageNumber: number) {
-  if (pageNumber !== currentPage.value && pageNumber >= 1 && pageNumber <= totalPages.value) {
-    currentPage.value = pageNumber;
+  if (pageNumber === currentPage.value || pageNumber < 1 || pageNumber > totalPages.value) {
+    return;
   }
-
-  if (totalPages.value > 5) {
-    cells.value = [];
-
-    let isAwayFromStartPoint = (pageNumber - 3) > 0;
-    if (isAwayFromStartPoint) {
-      cells.value.push(1);
-      cells.value.push(0);
-    }
-
-    for (let i = 1; i <= 2; i++) {
-      let previousCell = pageNumber - i;
-      if (previousCell > 0) {
-        cells.value.push(previousCell);
-      }
-    }
-
-    // Sort previous pages in ascending order
-    const currentIdx = cells.value.length;
-    cells.value.push(currentPage.value);
-
-    let nextPages = totalPages.value - pageNumber;
-    let hasNextPages = nextPages > 2;
-    let nextPagesSize = 2;
-
-    if (hasNextPages) {
-      for (let i = 1; i <= nextPagesSize; i++) {
-        cells.value.push(pageNumber + i);
-      }
-      cells.value.push(0);
-      cells.value.push(totalPages.value);
-    } else {
-      for (let i = 1; i <= nextPages; i++) {
-        cells.value.push(pageNumber + i);
-      }
-    }
-  }
-
+  currentPage.value = pageNumber;
+  buildCells(pageNumber);
   emit('page-changed', pageNumber);
 }
 
-watch(() => props.totalItems, () => {
+watch(() => [props.totalItems, props.itemsPerPage], () => {
   totalPages.value = Math.ceil(props.totalItems / props.itemsPerPage);
-
-  cells.value = [];
-  if (totalPages.value > 5) {
-    for (let i = 1; i < 5; i++) {
-      cells.value.push(i);
-    }
-    cells.value.push(0);
-    cells.value.push(totalPages.value);
-  } else {
-    for (let i = 1; i <= totalPages.value; i++) {
-      cells.value.push(i);
-    }
+  if (currentPage.value > totalPages.value) {
+    currentPage.value = Math.max(1, totalPages.value);
   }
+  buildCells(currentPage.value);
 }, { immediate: true })
 </script>
-
-<style lang="scss" scoped>
-span {
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  padding: 0.75rem;
-  text-decoration: none;
-  color: black;
-}
-
-ul {
-  display: flex;
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  margin-right: 3px;
-}
-
-a {
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  padding: 0.75rem;
-  text-decoration: none;
-  color: black;
-}
-
-a:hover {
-  background-color: rgb(195 197 201);
-  color: #000000;
-  cursor: pointer;
-}
-
-a.active:hover {
-  background-color: rgb(195 197 201);
-}
-
-a.active {
-  font-weight: 700;
-  border-radius: 10px;
-  background-color: #e5e7eb;
-  color: #000000;
-}
-</style>

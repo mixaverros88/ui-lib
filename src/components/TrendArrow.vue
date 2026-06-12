@@ -5,6 +5,12 @@
       <ArrowDownIcon class="h-5 w-5 text-red-500" />
     </span>
 
+    <!-- Flat trend: neutral badge, no directional arrow. -->
+    <span v-else-if="isZero" class="flex items-center space-x-2">
+      <BaseBadge :color="ColorsEnums.GRAY">{{ number }}{{ props.icon }}</BaseBadge>
+      <MinusIcon class="h-5 w-5 text-gray-400" />
+    </span>
+
     <span v-else class="flex items-center space-x-2">
       <BaseBadge :color="ColorsEnums.GREEN">{{ number }}{{ props.icon }}</BaseBadge>
       <ArrowUpIcon class="h-5 w-5 text-green-500" />
@@ -16,7 +22,7 @@
 import { computed } from 'vue'
 import BaseBadge from './BaseBadge.vue'
 import { ColorsEnums } from '../enums/ColorsEnums'
-import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/vue/24/outline'
+import { ArrowDownIcon, ArrowUpIcon, MinusIcon } from '@heroicons/vue/24/outline'
 
 const props = defineProps({
   number: {
@@ -30,4 +36,5 @@ const props = defineProps({
 })
 
 const isNegative = computed(() => props.number !== null && props.number !== undefined && props.number < 0)
+const isZero = computed(() => props.number === 0)
 </script>

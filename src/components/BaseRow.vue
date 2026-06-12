@@ -9,7 +9,7 @@ const props = defineProps({
   bgColor: {
     type: String,
     required: false,
-    default: "white"
+    default: "bg-white"
   }
 })
 

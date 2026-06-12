@@ -51,14 +51,6 @@ const props = defineProps({
     required: false,
     default: 'button'
   },
-  icon: {
-    type: String,
-    required: false
-  },
-  iconSize: {
-    type: String,
-    required: false
-  },
   iconLeft: {
     type: Boolean,
     required: false,
@@ -259,7 +251,7 @@ function computeCss() {
     case BaseButtonEnum.PURPLE: {
       css = isDisabled
         ? 'text-white bg-purple-400 cursor-not-allowed'
-        : 'focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 px-5 py-2.5 mb-2';
+        : 'focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300';
       break;
     }
     case BaseButtonEnum.SKY: {

@@ -1,6 +1,6 @@
 {
   "name": "mgv-backoffice",
-  "version": "1.17.0",
+  "version": "1.18.0",
   "description": "Shared Vue 3 UI component library",
   "type": "module",
   "main": "./dist/ui-lib.umd.cjs",
@@ -8,9 +8,9 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/ui-lib.js",
-      "require": "./dist/ui-lib.umd.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/ui-lib.umd.cjs"
     },
     "./dist/style.css": "./dist/ui-lib.css",
     "./tailwind.safelist": "./tailwind.safelist.js",
@@ -23,6 +23,8 @@
     "tailwind.safelist.css"
   ],
   "scripts": {
+    "safelist": "node scripts/generate-safelist.mjs",
+    "prebuild": "npm run safelist",
     "build": "vite build",
     "dev": "vite build --watch",
     "test": "vitest run",
