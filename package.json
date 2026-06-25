@@ -1,6 +1,6 @@
 {
   "name": "mgv-backoffice",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "description": "Shared Vue 3 UI component library",
   "type": "module",
   "main": "./dist/ui-lib.umd.cjs",
@@ -33,21 +33,22 @@
   "peerDependencies": {
     "@heroicons/vue": "^2.0.0",
     "vue": "^3.5.0",
-    "vue-router": "^4.0.0 || ^5.0.0"
+    "vue-router": "^5.0.0"
   },
   "devDependencies": {
     "@heroicons/vue": "^2.2.0",
-    "@tailwindcss/vite": "^4.2.2",
-    "@vitejs/plugin-vue": "^6.0.6",
+    "@tailwindcss/vite": "^4.3.1",
+    "@vitejs/plugin-vue": "^6.0.7",
+    "@vue/language-core": "^3.3.5",
     "@vue/test-utils": "^2.4.11",
-    "jsdom": "^25.0.1",
-    "sass": "^1.99.0",
-    "tailwindcss": "^4.2.2",
-    "typescript": "^6.0.2",
-    "vite": "^8.0.8",
-    "vite-plugin-dts": "^4.5.4",
-    "vitest": "^3.2.4",
-    "vue": "^3.5.32",
-    "vue-router": "^5.0.4"
+    "jsdom": "^29.1.1",
+    "sass": "^1.101.0",
+    "tailwindcss": "^4.3.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.0",
+    "vite-plugin-dts": "^5.0.3",
+    "vitest": "^4.1.9",
+    "vue": "^3.5.38",
+    "vue-router": "^5.1.0"
   }
 }

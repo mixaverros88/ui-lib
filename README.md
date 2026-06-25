@@ -13,8 +13,11 @@ npm install mgv-backoffice
 These must be installed in your project:
 
 ```bash
-npm install vue@^3.3.0 vue-router@^4.0.0 @heroicons/vue@^2.0.0
+npm install vue@^3.5.0 vue-router@^5.0.0 @heroicons/vue@^2.0.0
 ```
+
+> `vue-router` 5.x is required (peer range `^5.0.0`) — it's what the library is
+> developed and tested against. Upgrade from Router 4 before installing this library.
 
 ### Import Styles
 
@@ -227,17 +230,17 @@ SVG brand logo component.
 
 | Prop   | Type     | Default                | Description  |
 | ------ | -------- | ---------------------- | ------------ |
-| `size` | `String` | `BaseLoginEnum.MEDIUM` | Logo size    |
+| `size` | `String` | `BaseLogoEnum.MEDIUM`  | Logo size    |
 
 **Example:**
 
 ```vue
 <template>
-  <BaseLogo :size="BaseLoginEnum.LARGE" />
+  <BaseLogo :size="BaseLogoEnum.LARGE" />
 </template>
 
 <script setup lang="ts">
-import { BaseLogo, BaseLoginEnum } from 'mgv-backoffice'
+import { BaseLogo, BaseLogoEnum } from 'mgv-backoffice'
 </script>
 ```
 
@@ -552,7 +555,7 @@ import {
   BaseBadgeEnum,
   BaseButtonEnum,
   BaseButtonSizeEnum,
-  BaseLoginEnum,
+  BaseLogoEnum,
   BaseModalEnum,
   BaseToastEnum,
   ColorsEnums,
@@ -565,9 +568,9 @@ import {
 | -------------------- |---------------------------------------------------------------|
 | `AlertEnum`          | `WARNING`, `ERROR`, `SUCCESS`, `INFO`                         |
 | `BaseBadgeEnum`      | `WIN`, `LOSE`                                                 |
-| `BaseButtonEnum`     | `RED`, `BLUE`, `WHITE`, `DARK`, `GREEN`, `YELLOW`, `PURPLE`   |
+| `BaseButtonEnum`     | `RED`, `BLUE`, `WHITE`, `DARK`, `GREEN`, `EMERALD`, `YELLOW`, `PURPLE`, `SKY`, `GRAY`, `AMBER` |
 | `BaseButtonSizeEnum` | `EXTRA_SMALL`, `SMALL`, `BASE`, `LARGE`, `EXTRA_LARGE`        |
-| `BaseLoginEnum`      | `SMALL`, `MEDIUM`, `LARGE`                                    |
+| `BaseLogoEnum`       | `SMALL`, `MEDIUM`, `LARGE` (`BaseLoginEnum` is a deprecated alias) |
 | `BaseModalEnum`      | `DELETE`, `SUCCESS`                                           |
 | `BaseToastEnum`      | `SUCCESS`, `WARNING`, `ERROR`                                 |
 | `ColorsEnums`        | `NONE`, `RED`, `YELLOW`, `BLACK`, `GRAY`, `GREEN`, `BLUE`     |
