@@ -30,6 +30,9 @@ export { default as BasePageHeader } from './components/BasePageHeader.vue'
 export { default as BaseToolbarButton } from './components/BaseToolbarButton.vue'
 export { default as BaseActionButton } from './components/BaseActionButton.vue'
 export { default as BaseCopyButton } from './components/BaseCopyButton.vue'
+export { default as BaseGoogleSignInButton } from './components/BaseGoogleSignInButton.vue'
+export { default as BaseLoginForm } from './components/BaseLoginForm.vue'
+export { default as BaseNotificationPanel } from './components/BaseNotificationPanel.vue'
 
 // Composables
 export { useTheme, initTheme } from './composables/useTheme'
@@ -40,6 +43,9 @@ export { useEscapeKey } from './composables/useEscapeKey'
 export { useDebouncedRef } from './composables/useDebounce'
 export { useToast } from './composables/useToast'
 export { useMobileSidebar } from './composables/useMobileSidebar'
+export { useSidebarCollapse } from './composables/useSidebarCollapse'
+export type { UseSidebarCollapseOptions } from './composables/useSidebarCollapse'
+export { useNotifications } from './composables/useNotifications'
 
 // Enums
 export { AlertEnum } from './enums/AlertEnum'
@@ -57,6 +63,8 @@ export { PositioningEnum } from './enums/PositioningEnum'
 export type { BreadCrumb } from './components/BaseBreadcrumb.vue'
 export type { NavItem, NavSection } from './types/sidebar'
 export type { EntityPickerItem } from './types/entityPicker'
+export type { LoginCredentials } from './types/auth'
+export type { NotificationItem } from './types/notification'
 
 // Utils
 export { getBaseColor, getBaseColorOf } from './utils/util'

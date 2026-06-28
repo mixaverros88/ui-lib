@@ -707,6 +707,8 @@ computePnL({ buyPrice: 100, lastPrice: 110, filledQty: 5 })
 ### BaseAppLayout
 
 Root layout: dark/light page background, skip link, `<main>`-with-inert wrapper.
+The `<main>` content offset tracks the sidebar width automatically —
+`lg:ml-60` when expanded, `lg:ml-16` when collapsed (via `useSidebarCollapse()`).
 
 **Props:**
 
@@ -727,8 +729,9 @@ Root layout: dark/light page background, skip link, `<main>`-with-inert wrapper.
 ### BaseSidebar
 
 Responsive sidebar with desktop fixed-positioning and mobile off-canvas
-behavior, focus management, optional theme toggle, and configurable nav
-sections.
+behavior, focus management, optional theme toggle, a desktop collapse
+toggle (icon-only rail), an optional notifications bell, and configurable
+nav sections.
 
 **Props:**
 
@@ -739,6 +742,18 @@ sections.
 | `appName` | `String` | `''` | Optional app name in the footer. |
 | `version` | `String` | `''` | Optional version string in the footer. |
 | `showThemeToggle` | `Boolean` | `true` | Toggle the dark/light switch in the footer. |
+| `collapsible` | `Boolean` | `true` | Show the desktop collapse toggle that shrinks the sidebar to an icon-only rail. |
+| `showNotifications` | `Boolean` | `false` | Show the notifications bell (with unread badge) that toggles `BaseNotificationPanel`. |
+
+> **Collapse state** is shared via `useSidebarCollapse()` (and persisted to
+> localStorage) so `BaseAppLayout` can shrink the content offset from
+> `lg:ml-60` to `lg:ml-16` in step with the rail. Collapsing only affects
+> desktop (`lg+`); on mobile the sidebar stays a full off-canvas panel.
+
+> **Notifications:** set `:show-notifications="true"` to render the bell,
+> then drop a [`BaseNotificationPanel`](#basenotificationpanel) in your app.
+> Both share state through `useNotifications()`, so the unread badge and the
+> panel stay in sync.
 
 **Slots:**
 
@@ -772,6 +787,127 @@ interface NavSection {
     <HealthIndicator />
   </template>
 </BaseSidebar>
+```
+
+---
+
+### BaseNotificationPanel
+
+Left-anchored notification drawer (teleported to `<body>`, slides in from
+the left, backdrop + Escape to close). Open/close state and the list live
+in `useNotifications()`, so the sidebar bell and the panel stay in sync.
+
+Enable the bell on the sidebar with `:show-notifications="true"`, drop one
+`<BaseNotificationPanel />` anywhere in your app, and feed it data via the
+composable.
+
+**Props:**
+
+| Prop              | Type      | Default                        | Description |
+| ----------------- | --------- | ------------------------------ | ----------- |
+| `title`           | `String`  | `'Notifications'`              | Panel heading. |
+| `emptyText`       | `String`  | `'You have no notifications.'` | Shown when the list is empty. |
+| `showMarkAllRead` | `Boolean` | `true`                         | Render the "Mark all as read" action when there are unread items. |
+
+**Emits:** `select` (the clicked notification's `id`; the row is also marked read).
+
+```vue
+<script setup lang="ts">
+import { BaseNotificationPanel, useNotifications } from 'mgv-backoffice'
+const { setNotifications } = useNotifications()
+setNotifications([
+  { id: 1, title: 'New comment', message: 'Alice replied to your post', time: '2m ago', type: 'info' },
+  { id: 2, title: 'Build passed', time: '1h ago', read: true, type: 'success' },
+])
+</script>
+
+<template>
+  <BaseSidebar :sections="navSections" :show-notifications="true" />
+  <BaseNotificationPanel @select="(id) => goTo(id)" />
+</template>
+```
+
+```ts
+import type { NotificationItem } from 'mgv-backoffice'
+
+interface NotificationItem {
+  id: string | number
+  title: string
+  message?: string
+  time?: string                                   // pre-formatted by you
+  read?: boolean
+  type?: 'info' | 'success' | 'warning' | 'error' // status dot colour
+}
+```
+
+---
+
+## Authentication
+
+### BaseGoogleSignInButton
+
+Google-branded "Sign in with Google" button (official multi-colour "G",
+dark-mode surface swap). Purely presentational — it runs no OAuth itself;
+listen on `click` and start your own Google Identity / Firebase / backend
+flow there.
+
+**Props:**
+
+| Prop       | Type      | Default                    | Description |
+| ---------- | --------- | -------------------------- | ----------- |
+| `label`    | `String`  | `'Sign in with Google'`    | Button text. |
+| `loading`  | `Boolean` | `false`                    | Disables and shows a spinner. |
+| `disabled` | `Boolean` | `false`                    | Disables without the spinner. |
+| `block`    | `Boolean` | `true`                     | Full-width layout. |
+
+**Emits:** `click` (only when not disabled/loading).
+
+### BaseLoginForm
+
+Presentational sign-in card: email + password (with show/hide), an optional
+"Remember me" checkbox, an error banner, the Google button + "or" divider,
+and `logo` / `forgot` / `footer` slots. Owns its input state and emits
+`submit` / `google-sign-in`; the app handles the actual request and feeds
+back `loading` / `error`.
+
+**Props:**
+
+| Prop            | Type      | Default     | Description |
+| --------------- | --------- | ----------- | ----------- |
+| `title`         | `String`  | `'Sign in'` | Card heading. |
+| `subtitle`      | `String`  | `''`        | Muted line under the heading. |
+| `submitLabel`   | `String`  | `'Sign in'` | Submit button text. |
+| `loading`       | `Boolean` | `false`     | Disables the form, spinner on submit. |
+| `googleLoading` | `Boolean` | `false`     | Disables the form, spinner on the Google button. |
+| `error`         | `String`  | `''`        | Error banner above the form. |
+| `showGoogle`    | `Boolean` | `true`      | Render the Google button + divider. |
+| `showRemember`  | `Boolean` | `false`     | Render the "Remember me" checkbox. |
+
+**Emits:** `submit` (`LoginCredentials`), `google-sign-in`.
+
+**Slots:** `logo`, `forgot` (next to the password label), `footer`.
+
+```vue
+<script setup lang="ts">
+import { BaseLoginForm } from 'mgv-backoffice'
+import type { LoginCredentials } from 'mgv-backoffice'
+
+async function onSubmit(creds: LoginCredentials) { /* call your API */ }
+function onGoogle() { /* start Google OAuth */ }
+</script>
+
+<template>
+  <BaseLoginForm
+    subtitle="Welcome back"
+    :show-remember="true"
+    @submit="onSubmit"
+    @google-sign-in="onGoogle"
+  >
+    <template #logo><MyLogo /></template>
+    <template #forgot><a href="/forgot" class="text-sm text-emerald-600">Forgot?</a></template>
+    <template #footer>No account? <a href="/signup" class="text-emerald-600">Sign up</a></template>
+  </BaseLoginForm>
+</template>
 ```
 
 ---
@@ -1025,6 +1161,8 @@ import {
   useDebouncedRef,
   useToast,
   useMobileSidebar,
+  useSidebarCollapse,
+  useNotifications,
 } from 'mgv-backoffice'
 ```
 
@@ -1037,6 +1175,8 @@ import {
 | `useDebouncedRef(source, delay?)` | Debounced mirror of a ref. Timer cleared on scope dispose. |
 | `useToast(durationMs?)` | Per-component toast state: `{ showToast, toastMessage, toastType, showToastMessage }`. |
 | `useMobileSidebar()` | Singleton state shared between `BaseSidebar` and `BaseAppLayout` for the off-canvas open/closed flag. |
+| `useSidebarCollapse({ storageKey? })` | Singleton collapsed/expanded state for the desktop sidebar rail, shared between `BaseSidebar` and `BaseAppLayout` and persisted to localStorage (default key `'mgv-sidebar-collapsed'`). |
+| `useNotifications()` | Singleton notification state shared by the sidebar bell and `BaseNotificationPanel`: `{ notifications, unreadCount, open, openPanel, closePanel, togglePanel, setNotifications, add, remove, markRead, markAllRead, clear }`. |
 
 ---
 

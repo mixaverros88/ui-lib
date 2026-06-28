@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import { useMobileSidebar } from '../composables/useMobileSidebar'
+import { useSidebarCollapse } from '../composables/useSidebarCollapse'
 
 interface Props {
   /**
@@ -21,6 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { isDark } = useTheme()
 const { mobileOpen } = useMobileSidebar()
+const { collapsed } = useSidebarCollapse()
 
 const showSidebar = computed(() => props.showSidebar)
 </script>
@@ -57,7 +59,8 @@ const showSidebar = computed(() => props.showSidebar)
       id="main-content"
       tabindex="-1"
       :inert="showSidebar && mobileOpen ? true : undefined"
-      :class="showSidebar ? 'pt-14 lg:pt-0 lg:ml-60' : ''"
+      class="transition-all duration-300"
+      :class="showSidebar ? (collapsed ? 'pt-14 lg:pt-0 lg:ml-16' : 'pt-14 lg:pt-0 lg:ml-60') : ''"
     >
       <slot />
     </main>
