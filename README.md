@@ -414,28 +414,42 @@ import { ColoredSquares, ColorsEnums } from 'mgv-backoffice'
 
 ### EarningsCard
 
-Earnings summary card with formatted currency display.
+Earnings summary card with formatted currency display. Supports a signed P&L
+mode that renders a red loss theme (and a downward trend glyph) for negative
+amounts.
 
 **Props:**
 
 | Prop       | Type     | Default                 | Description          |
 | ---------- | -------- |-------------------------|----------------------|
 | `title`    | `String` | `'TOTAL EARNINGS'`      | Card heading         |
-| `amount`   | `Number` | `0`                     | Monetary value       |
+| `amount`   | `Number` | `0`                     | Monetary value (a stringified number is coerced) |
 | `subtitle` | `String` | `'Lifetime commission'` | Subheading text      |
 | `badge`    | `String` | `''`                    | Optional badge label |
 | `currency` | `String` | `'$'`                   | Currency symbol      |
 | `decimals` | `Number` | `2`                     | Fraction digits shown for the amount |
+| `accent`   | `'orange' \| 'emerald' \| 'red'` | `'orange'` | Card theme. `emerald` tints it green; `red` is the loss theme. |
+| `signed`   | `Boolean` | `false`                | Treat `amount` as a signed P&L figure: a negative value automatically switches to the `red` loss theme and flips the trend glyph to point **down**; a non-negative value keeps the chosen `accent` and the upward glyph. |
 
 **Example:**
 
 ```vue
 <template>
+  <!-- Always-positive total: original behaviour. -->
   <EarningsCard
     title="Monthly Revenue"
     :amount="12500"
     subtitle="April 2026"
     currency="€"
+  />
+
+  <!-- Signed P&L: renders red + a down arrow when the amount is negative. -->
+  <EarningsCard
+    title="TOTAL P&L"
+    :amount="-128.4"
+    subtitle="Realised + unrealised"
+    accent="emerald"
+    signed
   />
 </template>
 

@@ -3,13 +3,14 @@ import { computed } from 'vue'
 
 /**
  * Accent colour of the card. Defaults to `orange` so existing consumers are
- * unaffected; `emerald` lets a host app tint the card to a green-themed brand.
- * Each accent carries the full literal Tailwind class strings (rather than a
- * single interpolated hue) so the classes are statically detectable and the
- * two themes can differ in more than hue — e.g. orange renders the amount in
- * neutral grey while emerald renders it in the accent itself.
+ * unaffected; `emerald` lets a host app tint the card to a green-themed brand,
+ * and `red` renders a loss/negative theme (also selected automatically by
+ * `signed`, see below). Each accent carries the full literal Tailwind class
+ * strings (rather than a single interpolated hue) so the classes are statically
+ * detectable and the themes can differ in more than hue — e.g. orange renders
+ * the amount in neutral grey while emerald/red render it in the accent itself.
  */
-type Accent = 'orange' | 'emerald'
+type Accent = 'orange' | 'emerald' | 'red'
 
 interface Props {
   title?: string
@@ -19,6 +20,15 @@ interface Props {
   currency?: string
   decimals?: number
   accent?: Accent
+  /**
+   * Treat the card as a signed P&L figure. When `true` and the amount is
+   * negative, the card renders the loss theme automatically: the `red` accent
+   * (border / amount / subtitle / icon-box recoloured) AND the trend glyph
+   * flipped to point DOWN. A non-negative amount keeps the chosen `accent` and
+   * the upward glyph. Defaults to `false` so existing consumers — which use the
+   * card for always-positive totals like lifetime earnings — are unaffected.
+   */
+  signed?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -29,6 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
   currency: '$',
   decimals: 2,
   accent: 'orange',
+  signed: false,
 })
 
 const ACCENTS: Record<Accent, {
@@ -55,22 +66,40 @@ const ACCENTS: Record<Accent, {
     iconBox: 'bg-emerald-50 dark:bg-emerald-900/30',
     icon: 'text-emerald-500',
   },
+  red: {
+    border: 'border-red-300 dark:border-red-700',
+    badge: 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400',
+    amount: 'text-red-500 dark:text-red-400',
+    subtitle: 'text-red-500 dark:text-red-400',
+    iconBox: 'bg-red-50 dark:bg-red-900/30',
+    icon: 'text-red-500',
+  },
 }
 
-const cls = computed(() => ACCENTS[props.accent])
+// Coerce once: the amount can arrive as a JSON string (e.g. "-0.01"); fall back
+// to 0 for non-finite input (NaN/Infinity) so the card never renders "NaN".
+const numericAmount = computed(() => {
+  const n = Number(props.amount)
+  return Number.isFinite(n) ? n : 0
+})
 
-const formattedAmount = computed(() => {
-  // Guard against NaN/Infinity reaching toLocaleString (which would render the
-  // literal "NaN"); fall back to a zeroed amount so the card stays readable.
-  const amount = Number.isFinite(props.amount) ? props.amount : 0
-  return (
+// A loss only when the card is in signed mode and the value is below zero.
+const isLoss = computed(() => props.signed && numericAmount.value < 0)
+
+// In signed mode a negative amount forces the red loss theme; otherwise the
+// caller-chosen accent stands.
+const effectiveAccent = computed<Accent>(() => (isLoss.value ? 'red' : props.accent))
+
+const cls = computed(() => ACCENTS[effectiveAccent.value])
+
+const formattedAmount = computed(
+  () =>
     props.currency +
-    amount.toLocaleString('en-US', {
+    numericAmount.value.toLocaleString('en-US', {
       minimumFractionDigits: props.decimals,
       maximumFractionDigits: props.decimals,
-    })
-  )
-})
+    }),
+)
 </script>
 
 <template>
@@ -121,8 +150,16 @@ const formattedAmount = computed(() => {
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-          <polyline points="16 7 22 7 22 13" />
+          <!-- Loss: a downward trend line + down-right arrowhead (the upward
+               glyph mirrored vertically). Otherwise the standard up-trend. -->
+          <template v-if="isLoss">
+            <polyline points="22 17 13.5 8.5 8.5 13.5 2 7" />
+            <polyline points="16 17 22 17 22 11" />
+          </template>
+          <template v-else>
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+            <polyline points="16 7 22 7 22 13" />
+          </template>
         </svg>
       </div>
     </div>
