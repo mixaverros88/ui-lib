@@ -1164,6 +1164,135 @@ import { BaseCopyButton, BaseToastEnum } from 'mgv-backoffice'
 
 ---
 
+## Forms & tables
+
+These components use `dark:` Tailwind variants, so the consuming app must map
+the `dark` variant to the `.dark` class that `useTheme()` toggles (see
+[Tailwind setup for consumers](#tailwind-setup-for-consumers)).
+
+### BaseInput
+
+Themed text/number input carrying the shared field skin (slate border,
+`bg-slate-50` / dark `bg-slate-900` surface). Everything else — `placeholder`,
+`id`, `disabled`, `step`/`min`, extra classes like `font-mono` or
+`placeholder:*` — falls through via attrs and Vue class merging.
+
+**Props:**
+
+| Prop         | Type               | Default  | Description |
+| ------------ | ------------------ | -------- | ----------- |
+| `modelValue` | `String \| Number` | `''`     | `v-model` value. |
+| `type`       | `String`           | `'text'` | Native input type. |
+| `size`       | `String`           | `'md'`   | `'md'` = `px-3 py-2`, `'sm'` = `px-2 py-1.5`. |
+| `block`      | `Boolean`          | `true`   | Full-width (`w-full`); set `false` for inline fields. |
+
+**Emits:** `update:modelValue(value: string)` — always the raw string; parse
+numbers in the owner.
+
+```vue
+<BaseInput v-model="query" placeholder="e.g. AMD or BTC" class="font-mono" />
+```
+
+### BaseSelect
+
+Themed `<select>` sharing BaseInput's field skin. Options come from the
+default slot so callers keep full control of `<option>` rendering.
+
+**Props:**
+
+| Prop         | Type               | Default | Description |
+| ------------ | ------------------ | ------- | ----------- |
+| `modelValue` | `String \| Number` | `''`    | `v-model` value. |
+| `size`       | `String`           | `'sm'`  | `'sm'` = `px-2 py-1.5`, `'md'` = `px-3 py-2`. |
+| `block`      | `Boolean`          | `true`  | Full-width; set `false` for inline selects. |
+
+**Slots:** `default` — the `<option>` elements.
+**Emits:** `update:modelValue(value: string)`.
+
+```vue
+<BaseSelect v-model="strategyType">
+  <option v-for="e in catalog" :key="e.type" :value="e.type" :title="e.description">
+    {{ e.label }}
+  </option>
+</BaseSelect>
+```
+
+### BaseSegmentedControl
+
+Segmented button group ("All | Stock | Crypto"). One button per option; the
+selected one gets the filled treatment and `aria-pressed="true"`.
+
+**Props:**
+
+| Prop          | Type                | Default  | Description |
+| ------------- | ------------------- | -------- | ----------- |
+| `options`     | `SegmentedOption[]` | **required** | `{ value, label, title? }` per button. |
+| `modelValue`  | `String \| Number`  | **required** | Selected option's `value` (`v-model`). |
+| `variant`     | `String`            | `'base'` | `'base'` (`px-3 py-2`, emerald-500 fill), `'wide'` (`px-4 py-2`, emerald-600 fill), `'toolbar'` (`h-9` uppercase `text-xs` with focus-visible rings). |
+| `ariaLabel`   | `String`            | `''`     | When set, the wrapper renders `role="group"` + `aria-label`. |
+| `optionClass` | `Function`          | —        | `(option, active) => string` override for per-button fill classes (e.g. severity colours); layout stays owned by the variant. |
+
+**Emits:** `update:modelValue(value)`.
+
+```vue
+<BaseSegmentedControl v-model="assetFilter" :options="ASSET_FILTERS" />
+<BaseSegmentedControl v-model="exchange" :options="EXCHANGES" variant="wide" aria-label="Exchange" />
+```
+
+### BaseTable
+
+Styling shell for data tables — **not** a data grid. Owns the table skin
+(slate header band, `px-4 py-3` header cells, empty-state row); body rows are
+the caller's own `<tr>` markup via the default slot. Wrap it yourself for
+scrolling/card chrome (e.g. a `BaseRow` with `overflow-x-auto`).
+
+**Props:**
+
+| Prop        | Type            | Default      | Description |
+| ----------- | --------------- | ------------ | ----------- |
+| `columns`   | `TableColumn[]` | **required** | `{ label, align? }`; `align: 'right'` right-aligns the header cell. |
+| `empty`     | `Boolean`       | `false`      | True renders the empty-state row spanning every column. |
+| `emptyText` | `String`        | `'No rows.'` | Fallback empty-state text. |
+
+**Slots:** `default` — the `<tr>` rows; `empty` — custom empty-state content.
+
+```vue
+<BaseTable :columns="COLUMNS" :empty="rows.length === 0">
+  <template #empty>No trades match your filters.</template>
+  <tr v-for="row in rows" :key="row.id" class="border-t border-slate-200 dark:border-slate-700">
+    …
+  </tr>
+</BaseTable>
+```
+
+### BaseSpecFields
+
+Spec-driven form fields: renders a select / checkbox / number input per
+`SpecField`, with labels and help text, in a responsive two-column grid. Feed
+it a backend-described catalogue and every form editing those values stays in
+lockstep. Never mutates `params` — every edit is emitted as `(key, value)`
+and the owner writes it back into its own state.
+
+**Props:**
+
+| Prop     | Type                             | Default      | Description |
+| -------- | -------------------------------- | ------------ | ----------- |
+| `specs`  | `SpecField[]`                    | **required** | `{ key, label, type: 'decimal' \| 'integer' \| 'boolean' \| 'select', options?, step?, min?, help? }`. |
+| `params` | `Record<string, SpecFieldValue>` | **required** | Current values keyed by `spec.key`. |
+
+**Slots:** `after` (`{ spec }`) — extra content under each field (e.g. a live
+preview attached to one key).
+**Emits:** `update(key: string, value: SpecFieldValue)` — numbers are parsed
+(`parseFloat`); unparseable input passes through raw so the owner's
+validation can catch it.
+
+```vue
+<BaseSpecFields :specs="entry.params" :params="form.params"
+  @update="(key, value) => (form.params[key] = value)" />
+```
+
+---
+
 ## Composables
 
 ```ts

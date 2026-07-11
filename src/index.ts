@@ -34,6 +34,13 @@ export { default as BaseGoogleSignInButton } from './components/BaseGoogleSignIn
 export { default as BaseLoginForm } from './components/BaseLoginForm.vue'
 export { default as BaseNotificationPanel } from './components/BaseNotificationPanel.vue'
 
+// Components — extracted from TradeAutomation
+export { default as BaseInput } from './components/BaseInput.vue'
+export { default as BaseSelect } from './components/BaseSelect.vue'
+export { default as BaseSegmentedControl } from './components/BaseSegmentedControl.vue'
+export { default as BaseTable } from './components/BaseTable.vue'
+export { default as BaseSpecFields } from './components/BaseSpecFields.vue'
+
 // Composables
 export { useTheme, initTheme } from './composables/useTheme'
 export type { UseThemeOptions } from './composables/useTheme'
@@ -65,6 +72,9 @@ export type { NavItem, NavSection } from './types/sidebar'
 export type { EntityPickerItem } from './types/entityPicker'
 export type { LoginCredentials } from './types/auth'
 export type { NotificationItem } from './types/notification'
+export type { SegmentedOption } from './types/segmented'
+export type { TableColumn } from './types/table'
+export type { SpecField, SpecFieldType, SpecFieldValue } from './types/specField'
 
 // Utils
 export { getBaseColor, getBaseColorOf } from './utils/util'
