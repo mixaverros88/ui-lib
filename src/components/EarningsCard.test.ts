@@ -36,6 +36,36 @@ describe('EarningsCard', () => {
     expect(w.html()).toContain('border-red-300')
   })
 
+  describe('compact mode', () => {
+    it('keeps the large layout by default (backward compatibility)', () => {
+      const w = mount(EarningsCard, { props: { amount: 1 } })
+      expect(w.html()).toContain('p-6')
+      expect(w.html()).toContain('text-4xl')
+      expect(w.html()).not.toContain('text-lg')
+    })
+
+    it('renders tighter padding and smaller type when compact', () => {
+      const w = mount(EarningsCard, { props: { amount: 1, compact: true } })
+      const html = w.html()
+      expect(html).toContain('p-3')
+      expect(html).toContain('text-lg')
+      expect(html).not.toContain('text-4xl')
+    })
+
+    it('moves the trend glyph into the top-right corner when compact', () => {
+      const w = mount(EarningsCard, { props: { amount: 1, compact: true } })
+      expect(w.html()).toContain('absolute right-2 top-2')
+    })
+
+    it('still applies the signed loss theme in compact mode', () => {
+      const w = mount(EarningsCard, {
+        props: { amount: -5, compact: true, signed: true, accent: 'emerald' },
+      })
+      expect(w.html()).toContain('border-red-300')
+      expect(w.html()).toContain('p-3')
+    })
+  })
+
   describe('signed (P&L) mode', () => {
     // The "up-trend" arrowhead the default glyph uses; absent in the loss glyph.
     const UP_GLYPH = 'points="16 7 22 7 22 13"'

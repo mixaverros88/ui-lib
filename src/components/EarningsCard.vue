@@ -29,6 +29,15 @@ interface Props {
    * card for always-positive totals like lifetime earnings — are unaffected.
    */
   signed?: boolean
+  /**
+   * Dense variant for dashboards that tile many cards on one row: tighter
+   * padding, smaller type, and the trend glyph shrunk into the top-right
+   * corner (absolutely positioned so the amount keeps the full card width —
+   * important for long values like 8-decimal BTC quantities). Don't combine
+   * with `badge`: both occupy the top-right corner. Defaults to `false` so
+   * existing consumers keep the large layout.
+   */
+  compact?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -40,6 +49,7 @@ const props = withDefaults(defineProps<Props>(), {
   decimals: 2,
   accent: 'orange',
   signed: false,
+  compact: false,
 })
 
 const ACCENTS: Record<Accent, {
@@ -104,8 +114,8 @@ const formattedAmount = computed(
 
 <template>
   <div
-    class="relative rounded-xl border-2 border-dashed bg-white p-6 dark:bg-slate-800"
-    :class="cls.border"
+    class="relative rounded-xl border-2 border-dashed bg-white dark:bg-slate-800"
+    :class="[cls.border, compact ? 'p-3' : 'p-6']"
   >
     <!-- Badge -->
     <div
@@ -118,31 +128,38 @@ const formattedAmount = computed(
 
     <!-- Header row -->
     <div class="flex items-start justify-between">
-      <div>
-        <!-- Title -->
-        <p class="text-sm font-bold tracking-wide text-gray-800 dark:text-slate-200">
+      <div class="min-w-0">
+        <!-- Title: pr-8 in compact reserves only the corner the absolute icon
+             occupies — the amount below keeps the full card width so long
+             values (8-decimal BTC quantities) don't truncate. -->
+        <p
+          class="font-bold tracking-wide text-gray-800 dark:text-slate-200"
+          :class="compact ? 'pr-8 text-xs' : 'text-sm'"
+        >
           {{ title }}
         </p>
 
         <!-- Amount -->
-        <p class="mt-1 text-4xl font-bold" :class="cls.amount">
+        <p class="mt-1 font-bold truncate" :class="[cls.amount, compact ? 'text-lg' : 'text-4xl']">
           {{ formattedAmount }}
         </p>
 
         <!-- Subtitle -->
-        <p class="mt-1 text-sm font-medium" :class="cls.subtitle">
+        <p class="mt-1 font-medium" :class="[cls.subtitle, compact ? 'text-xs' : 'text-sm']">
           {{ subtitle }}
         </p>
       </div>
 
       <!-- Chart icon -->
       <div
-        class="mt-6 flex h-12 w-12 items-center justify-center rounded-xl"
-        :class="cls.iconBox"
+        class="flex items-center justify-center"
+        :class="[
+          cls.iconBox,
+          compact ? 'absolute right-2 top-2 h-6 w-6 rounded-lg' : 'mt-6 h-12 w-12 rounded-xl',
+        ]"
       >
         <svg
-          class="h-6 w-6"
-          :class="cls.icon"
+          :class="[cls.icon, compact ? 'h-3.5 w-3.5' : 'h-6 w-6']"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
