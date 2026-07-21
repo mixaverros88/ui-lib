@@ -21,7 +21,7 @@
   <section class="rounded-xl border overflow-hidden transition-colors" :class="t.cardAlt">
     <button
       type="button"
-      class="w-full flex items-center justify-between p-4 text-left transition-colors"
+      class="w-full flex items-center justify-between p-4 text-left transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500"
       :class="headerClasses"
       :aria-expanded="!collapsed"
       @click="emit('toggle')"

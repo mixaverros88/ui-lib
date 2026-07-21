@@ -8,7 +8,7 @@ function cellLabels(wrapper: ReturnType<typeof mount>): string[] {
 }
 
 async function clickPage(wrapper: ReturnType<typeof mount>, page: number) {
-  const link = wrapper.findAll('a').find(a => a.text().trim() === String(page))
+  const link = wrapper.findAll('button').find(b => b.text().trim() === String(page))
   expect(link, `expected a visible cell for page ${page}`).toBeTruthy()
   await link!.trigger('click')
 }
@@ -80,6 +80,6 @@ describe('Pagination', () => {
     await clickPage(wrapper, 7)
     await wrapper.setProps({ totalItems: 40 })
     expect(cellLabels(wrapper)).toEqual(['1', '2'])
-    expect(wrapper.find('a.active').text()).toBe('2')
+    expect(wrapper.find('button.active').text()).toBe('2')
   })
 })

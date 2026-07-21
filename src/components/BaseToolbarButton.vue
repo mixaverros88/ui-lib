@@ -21,7 +21,7 @@
     :type="type"
     :disabled="disabled"
     :title="title"
-    class="inline-flex shrink-0 items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+    class="inline-flex shrink-0 items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
     :class="variantClass"
     @click="$emit('click', $event)"
   >

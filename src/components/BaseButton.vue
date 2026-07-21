@@ -139,7 +139,7 @@ function outlineCss() {
   const isDisabled = props.isDisable || props.isLoading;
   return isDisabled
     ? `border bg-transparent ${tone} opacity-50 cursor-not-allowed`
-    : `focus:outline-none border bg-transparent ${tone}`;
+    : `focus:outline-none focus-visible:ring-2 focus-visible:ring-current border bg-transparent ${tone}`;
 }
 
 // Per-colour ghost palette: borderless, transparent fill, coloured text,
@@ -198,12 +198,13 @@ function ghostCss() {
   const isDisabled = props.isDisable || props.isLoading;
   return isDisabled
     ? `bg-transparent ${tone} opacity-60 cursor-not-allowed`
-    : `focus:outline-none bg-transparent ${tone} cursor-pointer`;
+    : `focus:outline-none focus-visible:ring-2 focus-visible:ring-current bg-transparent ${tone} cursor-pointer`;
 }
 
 function computeCss() {
   const isDisabled = props.isDisable || props.isLoading;
-  let commonCss = "inline-flex items-center";
+  let commonCss = "inline-flex items-center transition-colors duration-150";
+  if (!isDisabled) { commonCss += " cursor-pointer"; }
   let css;
   switch (props.color) {
     case BaseButtonEnum.BLUE: {

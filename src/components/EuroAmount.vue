@@ -1,9 +1,9 @@
 <template>
-  <span v-if="hasAmount && shouldBeGreen" class="font-bold text-green-800">
+  <span v-if="hasAmount && shouldBeGreen" class="font-bold text-green-800 dark:text-green-400">
     {{ amount }} <span v-if="showCurrency">&euro;</span>
   </span>
 
-  <span v-if="hasAmount && !shouldBeGreen" :class="[baseClasses, shouldBeRed ? 'text-red-800' : 'text-gray-800']">
+  <span v-if="hasAmount && !shouldBeGreen" :class="[baseClasses, shouldBeRed ? 'text-red-800 dark:text-red-400' : 'text-gray-800 dark:text-gray-200']">
     {{ amount }} <span v-if="showCurrency">&euro;</span>
   </span>
 </template>

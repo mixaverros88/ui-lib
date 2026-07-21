@@ -94,7 +94,7 @@ function navigate(name: string) {
     <!-- Mobile top bar (hidden on desktop via scoped CSS to avoid flex/hidden conflict) -->
     <div class="mobile-topbar fixed top-0 inset-x-0 z-30 flex items-center justify-between px-4 py-3 border-b transition-colors"
       :class="isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'">
-      <button type="button" @click="goHome" class="cursor-pointer" aria-label="Go to home">
+      <button type="button" @click="goHome" class="cursor-pointer rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="Go to home">
         <!--
           `logo` slot: consumers drop their brand logo in here. Receives
           the current size hint so a logo component can scale to match.
@@ -104,7 +104,7 @@ function navigate(name: string) {
       <button
         type="button"
         @click="toggleMobile"
-        class="p-2 rounded-lg cursor-pointer"
+        class="p-2 rounded-lg cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         :class="isDark ? 'text-gray-400 hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-100'"
         :aria-label="mobileOpen ? 'Close navigation menu' : 'Open navigation menu'"
         :aria-expanded="mobileOpen"
@@ -138,7 +138,7 @@ function navigate(name: string) {
           class="px-5 pt-5 pb-4 flex items-center justify-center relative"
           :class="{ 'lg:px-2': isRail }"
         >
-          <button type="button" @click="goHome" class="cursor-pointer" aria-label="Go to home">
+          <button type="button" @click="goHome" class="cursor-pointer rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="Go to home">
             <slot name="logo" :size="isRail ? 36 : 52" />
           </button>
           <button

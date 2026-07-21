@@ -25,7 +25,7 @@
     :disabled="disabled"
     :title="title"
     :aria-label="ariaLabel"
-    class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+    class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-current"
     :class="[fullWidth ? 'flex-1' : '', stateClass]"
     @click="$emit('click', $event)"
   >

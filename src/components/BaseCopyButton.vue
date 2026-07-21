@@ -75,7 +75,7 @@ const ariaLabel = computed(() => (props.label ? `Copy ${props.label}` : 'Copy'))
 const buttonClass = computed(() => {
   if (props.variant === 'bordered') {
     const base =
-      'inline-flex items-center justify-center w-9 h-9 rounded-lg border transition-colors cursor-pointer shrink-0'
+      'inline-flex items-center justify-center w-9 h-9 rounded-lg border transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500'
     const state = copied.value
       ? isDark.value
         ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
@@ -86,7 +86,7 @@ const buttonClass = computed(() => {
     return `${base} ${state}`
   }
   // ghost
-  const base = 'p-1 rounded transition-colors cursor-pointer'
+  const base = 'p-1 rounded transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500'
   const state = isDark.value
     ? 'text-gray-400 hover:text-emerald-300 hover:bg-emerald-500/10'
     : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50'

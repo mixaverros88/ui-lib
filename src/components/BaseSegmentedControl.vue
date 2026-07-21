@@ -75,12 +75,12 @@ const wrapClass = computed(() =>
 const buttonClass = computed(() => {
   if (props.variant === 'toolbar') {
     return (
-      'flex items-center px-3.5 text-xs font-semibold uppercase tracking-wide transition-colors ' +
+      'flex items-center px-3.5 text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer ' +
       'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500'
     )
   }
   const padding = props.variant === 'wide' ? 'px-4 py-2' : 'px-3 py-2'
-  return `${padding} text-sm font-medium transition-colors border-l first:border-l-0 border-slate-300 dark:border-slate-600`
+  return `${padding} text-sm font-medium transition-colors cursor-pointer border-l first:border-l-0 border-slate-300 dark:border-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500`
 })
 
 const activeFill = computed(() =>

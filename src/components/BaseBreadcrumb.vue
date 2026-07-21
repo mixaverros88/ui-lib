@@ -3,7 +3,7 @@
     <ol class="inline-flex items-center space-x-1 md:space-x-3">
 
       <li class="inline-flex items-center" style="margin-left: 0;">
-        <router-link to="/" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+        <router-link to="/" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
           <HomeIcon class="h-4 w-4 text-gray-500 mr-2" />
           Home
         </router-link>
@@ -11,7 +11,7 @@
 
       <li v-for="(crumb, index) in crumbs" :key="index" class="inline-flex items-center" style="margin-left: 0;">
         <ChevronRightIcon class="h-4 w-4 text-gray-500" />
-        <router-link :to="crumb.url" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-white">
+        <router-link :to="crumb.url" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-white transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
           {{ crumb.name }}
         </router-link>
       </li>

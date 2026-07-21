@@ -55,10 +55,12 @@
 
     <!-- Item list -->
     <div v-if="!loading && !loadError" class="mt-3 max-h-64 overflow-y-auto">
-      <div
+      <button
         v-for="item in filteredItems"
         :key="item.id"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors"
+        type="button"
+        :aria-pressed="selectedId === item.id"
+        class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500"
         :class="[
           selectedId === item.id
             ? palette.selectedRow
@@ -81,7 +83,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-      </div>
+      </button>
 
       <!-- Empty states -->
       <div v-if="items.length === 0" class="text-center py-6">
@@ -100,7 +102,7 @@
       <button
         type="button"
         :disabled="submitting"
-        class="inline-flex items-center justify-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="inline-flex items-center justify-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         :class="t.ghostButton"
         @click="handleCancel"
       >
@@ -109,7 +111,7 @@
       <button
         type="button"
         :disabled="!selectedId || submitting"
-        class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition-colors duration-150"
+        class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         :class="!selectedId || submitting ? palette.confirmDisabled : palette.confirmActive"
         @click="handleConfirm"
       >

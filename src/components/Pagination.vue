@@ -1,20 +1,20 @@
 <template>
-  <div>
+  <nav aria-label="Pagination">
     <ul class="flex list-none p-0 m-0">
       <li v-for="(cell, index) in cells" :key="index" class="mr-1">
-        <a
+        <button
           v-if="cell !== 0"
-          role="button"
-          tabindex="0"
+          type="button"
+          :aria-current="cell === currentPage ? 'page' : undefined"
+          :aria-label="`Go to page ${cell}`"
           @click="changePage(cell)"
-          @keydown.enter="changePage(cell)"
-          class="inline-block border border-gray-300 rounded-lg p-3 no-underline text-black cursor-pointer hover:bg-gray-300"
-          :class="{ 'active font-bold bg-gray-200': cell === currentPage }"
-        >{{ cell }}</a>
-        <span v-else class="inline-block border border-gray-300 rounded-lg p-3 text-black cursor-not-allowed">...</span>
+          class="inline-block min-w-[44px] border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-black dark:text-gray-200 cursor-pointer transition-colors hover:bg-gray-300 dark:hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+          :class="{ 'active font-bold bg-gray-200 dark:bg-gray-700': cell === currentPage }"
+        >{{ cell }}</button>
+        <span v-else aria-hidden="true" class="inline-block border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-black dark:text-gray-200 cursor-not-allowed">...</span>
       </li>
     </ul>
-  </div>
+  </nav>
 </template>
 
 <script lang="ts" setup>
