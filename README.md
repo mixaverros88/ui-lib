@@ -599,11 +599,12 @@ import {
 import type { BreadCrumb, PnL, PnLInputs } from 'mgv-backoffice'
 ```
 
-| Type         | Shape                                  |
-| ------------ | -------------------------------------- |
-| `BreadCrumb` | `{ name: string; url: string }`        |
-| `PnLInputs`  | `{ buyPrice; lastPrice; filledQty }` (each `number \| string \| null \| undefined`) |
-| `PnL`        | `{ pnlUsd: number \| null; pnlPct: number \| null }` |
+| Type             | Shape                                  |
+| ---------------- | -------------------------------------- |
+| `BreadCrumb`     | `{ name: string; url: string }`        |
+| `DropdownOption` | `{ value: string \| number; label: string; title?: string; disabled?: boolean }` |
+| `PnLInputs`      | `{ buyPrice; lastPrice; filledQty }` (each `number \| string \| null \| undefined`) |
+| `PnL`            | `{ pnlUsd: number \| null; pnlPct: number \| null }` |
 
 ---
 
@@ -1215,6 +1216,38 @@ default slot so callers keep full control of `<option>` rendering.
     {{ e.label }}
   </option>
 </BaseSelect>
+```
+
+### BaseDropdown
+
+Button-style single-select dropdown ("Select Social User ⌄"). Unlike
+`BaseSelect` (a native `<select>`), this renders a trigger button plus a
+floating menu, so the closed control shows a placeholder and a chevron that
+rotates while open — matching the app's filter dropdowns. Selecting a row
+emits its `value` and closes the menu; Escape and an outside click also close
+it.
+
+**Props:**
+
+| Prop          | Type                       | Default      | Description |
+| ------------- | -------------------------- | ------------ | ----------- |
+| `options`     | `DropdownOption[]`         | **required** | `{ value, label, title?, disabled? }` per row. |
+| `modelValue`  | `String \| Number \| null` | `null`       | Selected option's `value` (`v-model`). |
+| `placeholder` | `String`                   | `'Select'`   | Trigger text shown when nothing is selected. |
+| `size`        | `String`                   | `'md'`       | `'md'` = `px-4 py-2.5` (app filter height), `'sm'` = `px-3 py-2`. |
+| `block`       | `Boolean`                  | `true`       | Full-width; set `false` for an inline, content-width dropdown. |
+| `disabled`    | `Boolean`                  | `false`      | Disables the trigger. |
+| `ariaLabel`   | `String`                   | `''`         | Accessible name for the trigger/listbox when there is no visible label. |
+
+**Emits:** `update:modelValue(value)`.
+
+```vue
+<BaseDropdown
+  v-model="socialUserId"
+  :options="socialUsers.map((u) => ({ value: u.id, label: u.name }))"
+  placeholder="Select Social User"
+  aria-label="Social user"
+/>
 ```
 
 ### BaseSegmentedControl

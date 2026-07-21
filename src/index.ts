@@ -37,6 +37,7 @@ export { default as BaseNotificationPanel } from './components/BaseNotificationP
 // Components — extracted from TradeAutomation
 export { default as BaseInput } from './components/BaseInput.vue'
 export { default as BaseSelect } from './components/BaseSelect.vue'
+export { default as BaseDropdown } from './components/BaseDropdown.vue'
 export { default as BaseSegmentedControl } from './components/BaseSegmentedControl.vue'
 export { default as BaseTable } from './components/BaseTable.vue'
 export { default as BaseSpecFields } from './components/BaseSpecFields.vue'
@@ -73,6 +74,7 @@ export type { EntityPickerItem } from './types/entityPicker'
 export type { LoginCredentials } from './types/auth'
 export type { NotificationItem } from './types/notification'
 export type { SegmentedOption } from './types/segmented'
+export type { DropdownOption } from './types/dropdown'
 export type { TableColumn } from './types/table'
 export type { SpecField, SpecFieldType, SpecFieldValue } from './types/specField'
 
