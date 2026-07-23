@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+/* Compile `dark:` variants against the `.dark` class that useTheme()/initTheme()
+   toggle on <html> — NOT the OS-level prefers-color-scheme media query
+   (Tailwind v4's default). Both consumers (TradeAutomation, WireMate) switch
+   themes with the class toggle, so media-gated dark rules leak the dark skin
+   into the light theme for users whose OS prefers dark.
+   Use a specificity-bearing selector (:is, not :where) so dark: utilities win
+   over plain base utilities like bg-slate-50 on a cascade tie. */
+@custom-variant dark (&:is(.dark, .dark *));

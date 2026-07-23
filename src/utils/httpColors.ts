@@ -52,6 +52,37 @@ export function statusBadgeSolid(status?: number): string {
   return 'bg-gray-600'
 }
 
+/**
+ * Dark/light-aware tinted method badge — per-method hue on a soft
+ * `*-500/15` (dark) / `*-100` (light) surface, for card-surface chips.
+ * (Extracted from WireMate's mock/stub cards; GET is blue here, unlike
+ * the green-leaning bright family above.)
+ */
+export function methodBadgeTinted(method: string | undefined, isDark: boolean): string {
+  const m = (method || 'ANY').toUpperCase()
+  if (m === 'GET') return isDark ? 'bg-blue-500/15 text-blue-400' : 'bg-blue-100 text-blue-700'
+  if (m === 'POST') return isDark ? 'bg-emerald-500/15 text-emerald-400' : 'bg-emerald-100 text-emerald-700'
+  if (m === 'PUT') return isDark ? 'bg-amber-500/15 text-amber-400' : 'bg-amber-100 text-amber-700'
+  if (m === 'DELETE') return isDark ? 'bg-red-500/15 text-red-400' : 'bg-red-100 text-red-700'
+  if (m === 'PATCH') return isDark ? 'bg-purple-500/15 text-purple-400' : 'bg-purple-100 text-purple-700'
+  if (m === 'HEAD') return isDark ? 'bg-sky-500/15 text-sky-400' : 'bg-sky-100 text-sky-700'
+  return isDark ? 'bg-gray-500/15 text-gray-400' : 'bg-gray-100 text-gray-600'
+}
+
+/**
+ * Dark/light-aware soft status badge keyed by status class — emerald 2xx,
+ * sky 3xx, amber 4xx, red 5xx, gray otherwise. Softer companion to
+ * `statusBadgeTinted` (which uses the green/blue/yellow palette).
+ */
+export function statusBadgeSoft(status: number | undefined, isDark: boolean): string {
+  const code = status ?? 200
+  if (code >= 200 && code < 300) return isDark ? 'bg-emerald-500/15 text-emerald-300' : 'bg-emerald-100 text-emerald-700'
+  if (code >= 300 && code < 400) return isDark ? 'bg-sky-500/15 text-sky-300' : 'bg-sky-100 text-sky-700'
+  if (code >= 400 && code < 500) return isDark ? 'bg-amber-500/15 text-amber-300' : 'bg-amber-100 text-amber-700'
+  if (code >= 500 && code < 600) return isDark ? 'bg-red-500/15 text-red-300' : 'bg-red-100 text-red-700'
+  return isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
+}
+
 /** Dark/light-aware tinted status badge. */
 export function statusBadgeTinted(status: number | undefined, isDark: boolean): string {
   const code = status ?? 200

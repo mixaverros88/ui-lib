@@ -61,4 +61,27 @@ describe('BaseDropdown', () => {
     expect(rows[1].attributes('aria-selected')).toBe('false')
     expect(rows[0].get('button').classes()).toContain('bg-emerald-500')
   })
+
+  it('replaces the default trigger skin when triggerClass is set', () => {
+    const wrapper = mount(BaseDropdown, {
+      props: { options, modelValue: '1', triggerClass: 'rounded border bg-red-100 text-red-700 px-1.5 py-0.5' },
+    })
+    const classes = wrapper.get('button').classes()
+    // Custom skin applied…
+    expect(classes).toContain('bg-red-100')
+    expect(classes).toContain('text-red-700')
+    // …and the default slate skin dropped (layout/focus classes remain).
+    expect(classes).not.toContain('border-slate-300')
+    expect(classes).not.toContain('bg-white')
+    expect(classes).toContain('cursor-pointer')
+  })
+
+  it('sizes the chevron via chevronClass', () => {
+    const wrapper = mount(BaseDropdown, {
+      props: { options, modelValue: '1', chevronClass: 'w-3 h-3' },
+    })
+    const chevron = wrapper.get('button svg')
+    expect(chevron.classes()).toContain('w-3')
+    expect(chevron.classes()).not.toContain('w-5')
+  })
 })

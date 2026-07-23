@@ -11,6 +11,11 @@ export interface SpecField {
   key: string
   label: string
   type: SpecFieldType
+  /**
+   * Default value the form seeds the field with. `null` marks the field as
+   * OPTIONAL for `firstInvalidNumericSpec` (blank = "knob disabled").
+   */
+  default?: SpecFieldValue | null
   /** Choices for `type: 'select'`. */
   options?: string[] | null
   /** Step for numeric inputs; defaults to 1 (integer) / 0.01 (decimal). */

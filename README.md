@@ -52,21 +52,32 @@ Or include the pre-built CSS safelist:
 
 ### BaseAlert
 
-Dismissible alert banner with color-coded variants.
+Inline notice panel with color-coded variants (error / warning / success /
+info), theme-aware via the shared `isDark` ref. The optional default slot
+renders body content under the title, and `compact` gives a slim text-xs
+variant for in-form warnings.
 
 **Props:**
 
-| Prop    | Type        | Default            | Description              |
-| ------- | ----------- | ------------------ | ------------------------ |
-| `title` | `String`    | `AlertEnum.ERROR`  | Text displayed in alert  |
-| `color` | `AlertEnum` | `AlertEnum.ERROR`  | Alert color variant      |
+| Prop      | Type        | Default            | Description              |
+| --------- | ----------- | ------------------ | ------------------------ |
+| `title`   | `String`    | `''`               | Bold headline (optional when the slot carries the message). |
+| `color`   | `AlertEnum` | `AlertEnum.ERROR`  | Alert color variant.     |
+| `compact` | `Boolean`   | `false`            | Slim variant: text-xs, smaller icon/padding. |
+
+**Slots:** default — body content rendered under the title.
 
 **Example:**
 
 ```vue
 <template>
   <BaseAlert title="Operation successful" :color="AlertEnum.SUCCESS" />
-  <BaseAlert title="Something went wrong" :color="AlertEnum.ERROR" />
+  <BaseAlert title="Proxying is active." :color="AlertEnum.WARNING">
+    <p class="mt-0.5 text-xs opacity-90">The canned response below is ignored.</p>
+  </BaseAlert>
+  <BaseAlert compact :color="AlertEnum.WARNING">
+    Chunked dribble is ignored while Fault Simulation is active.
+  </BaseAlert>
 </template>
 
 <script setup lang="ts">
@@ -625,8 +636,10 @@ import { getBaseColor, getBaseColorOf } from 'mgv-backoffice'
 import {
   methodBadgeSolid,
   methodBadgeBright,
+  methodBadgeTinted,
   statusBadgeSolid,
   statusBadgeTinted,
+  statusBadgeSoft,
 } from 'mgv-backoffice'
 ```
 
@@ -634,6 +647,27 @@ Tailwind class helpers for HTTP method and status code badges. `Solid` variants
 return saturated `bg-*-600` classes for use on neutral surfaces; `Bright` /
 `Tinted` variants return softer combinations suitable for cards. `statusBadgeTinted`
 takes `(status, isDark)` to adapt between themes.
+
+`methodBadgeTinted(method, isDark)` gives each method its own hue on a soft
+tinted surface (`bg-*-500/15` dark / `bg-*-100` light; GET blue, POST emerald,
+PUT amber, DELETE red, PATCH purple, HEAD sky) — the card-chip palette used by
+WireMate's mock/stub cards. `statusBadgeSoft(status, isDark)` is its status
+companion keyed by status class (emerald 2xx / sky 3xx / amber 4xx / red 5xx).
+
+### Key/value row validators
+
+```ts
+import { rowKeyMissing, rowValueMissing } from 'mgv-backoffice'
+```
+
+| Function          | Signature                                                              | Returns |
+| ----------------- | ---------------------------------------------------------------------- | ------- |
+| `rowValueMissing` | `(row: { key?, value?, matcherType? }) => boolean`                     | `true` when the row has a key but no value. |
+| `rowKeyMissing`   | `(row: { key?, value?, matcherType? }) => boolean`                     | `true` when the row has a value but no key. |
+
+Consistency checks for dynamic key/value grids (header lists, query params,
+metadata rows). Rows with `matcherType: 'absent'` are exempt — an absent
+matcher intentionally carries no value.
 
 ### HTML sanitizer
 
@@ -681,10 +715,30 @@ API values can be passed without pre-sanitising.
 | `fmtNumber`    | `(n: number \| string \| null \| undefined, digits = 4) => string` | Fixed-fraction number; em-dash for null/undefined/non-finite. Accepts numeric strings. |
 | `fmtDate`      | `(s: string \| number \| null \| undefined) => string`          | Locale date-time from ISO string or epoch; em-dash on empty, raw value on parse failure. |
 | `fmtDateTime`  | `(ms: number) => string`                                        | Compact `"Mon D, HH:MM"` label from epoch-millis (chart axes/tooltips). |
+| `fmtDateTimeMs`| `(s: string \| number) => string`                               | Full 24-hour locale date-time WITH the millisecond fraction — for dense feeds where same-second rows must stay distinguishable. |
 | `fmtDateShort` | `(ms: number) => string`                                        | Short `"Mon D"` calendar label from epoch-millis. |
+| `fmtCalendarDate` | `(s: string \| number \| null \| undefined) => string`       | `"Mon D, YYYY"` en-US calendar label; em-dash on empty, raw value on parse failure. |
+| `fmtCalendarDateTime` | `(s: string \| number \| null \| undefined) => string`   | `"Mon D, YYYY, HH:MM"` en-US calendar label with time of day. |
+| `fmtMsAsSeconds` | `(ms: number \| null \| undefined) => string`                 | `"= 1.50 s"` magnitude hint for millisecond inputs (3 decimals below 1 s); `''` for non-positive input. |
+| `fmtBytes`     | `(bytes: number \| null \| undefined) => string`                | `"512 B"` / `"1.5 KB"` / `"2.0 MB"`; `''` for zero/falsy input. |
 | `fmtPrice`     | `(n: number) => string`                                         | Price with precision that scales to magnitude (more decimals for sub-cent values). |
 | `fmtPct`       | `(n: number, digits = 2) => string`                             | Percentage with explicit sign, e.g. `"+2.50%"`. |
 | `fmtUsd`       | `(v: number) => string`                                         | Signed USD amount with leading sign, e.g. `"+$5.00"`. |
+
+### Spec-form helpers
+
+```ts
+import { buildSpecParams, firstInvalidNumericSpec } from 'mgv-backoffice'
+```
+
+Value-map helpers for spec-driven forms (the state behind `BaseSpecFields`).
+A spec whose `default` is `null` is treated as OPTIONAL — blank means "knob
+disabled" and passes validation.
+
+| Function                 | Signature | Returns |
+| ------------------------ | --------- | ------- |
+| `buildSpecParams`        | `(specs: SpecField[] \| undefined, existing: Record<string, SpecFieldValue>) => Record<string, SpecFieldValue>` | Value map seeded from each spec's `default`, keeping overlapping values the caller already has. |
+| `firstInvalidNumericSpec`| `(specs: SpecField[] \| undefined, params: Record<string, SpecFieldValue>) => string \| null` | Label of the first blank / NaN numeric field, or `null` when all numerics are valid. |
 
 ### Profit & loss
 
@@ -1165,6 +1219,59 @@ import { BaseCopyButton, BaseToastEnum } from 'mgv-backoffice'
 
 ---
 
+### BaseChipButton
+
+Small tinted emerald "chip" action button — the compact "+ Add" pill used
+above repeatable form rows. Label comes from the default slot.
+
+**Props:**
+
+| Prop       | Type      | Default | Description |
+| ---------- | --------- | ------- | ----------- |
+| `size`     | `String`  | `'sm'`  | `'sm'` = `px-2.5 py-1`; `'xs'` = `px-2 py-0.5` for tight corners. |
+| `disabled` | `Boolean` | `false` | Dims the chip and blocks clicks. |
+
+**Emits:** `click`.
+
+```vue
+<BaseChipButton @click="addRow(rows)">+ Add</BaseChipButton>
+<BaseChipButton size="xs" @click="addNamespace">+ Add</BaseChipButton>
+```
+
+---
+
+### BaseRemoveButton
+
+The red "×" remove-row affordance used beside repeatable form rows. Name it
+for screen readers via `aria-label`; `title`, `disabled` and extra classes
+(`pt-1`, `self-start`, …) fall through as attrs.
+
+**Emits:** `click`.
+
+```vue
+<BaseRemoveButton :aria-label="`Remove header ${i + 1}`" @click="rows.splice(i, 1)" />
+```
+
+---
+
+### BaseStatusPill
+
+Connection/health status pill: a colored dot (pulsing while `ok`) next to a
+short label on a tinted background.
+
+**Props:**
+
+| Prop     | Type     | Default | Description |
+| -------- | -------- | ------- | ----------- |
+| `status` | `String` | **required** | `'ok'` (emerald, pulsing), `'error'` (red), `'unknown'` (gray). |
+| `label`  | `String` | **required** | Short text next to the dot, e.g. `WireMock Connected`. |
+
+```vue
+<BaseStatusPill :status="healthy ? 'ok' : 'error'" :label="healthy ? 'Connected' : 'Disconnected'" />
+```
+
+---
+
 ## Forms & tables
 
 These components use `dark:` Tailwind variants, so the consuming app must map
@@ -1324,6 +1431,72 @@ validation can catch it.
   @update="(key, value) => (form.params[key] = value)" />
 ```
 
+### BaseFilterChip
+
+Colour-coded toggleable filter chip — one-click event/category filters above
+a data feed. Idle renders a tinted border/background in the semantic colour;
+active renders a solid fill with white text (`aria-pressed` reflects the
+state). Layout classes (`h-9 flex-1`, …) pass through the class attribute;
+click handlers bind natively on the component.
+
+**Props:**
+
+| Prop       | Type      | Default   | Description |
+| ---------- | --------- | --------- | ----------- |
+| `label`    | `String`  | `''`      | Chip text; the default slot overrides it. |
+| `color`    | `'emerald' \| 'sky' \| 'amber' \| 'red' \| 'slate'` | `'slate'` | Semantic colour of the idle tint and active fill. |
+| `active`   | `Boolean` | `false`   | Whether the chip's filter is applied (solid fill). |
+| `disabled` | `Boolean` | `false`   | Greys out + blocks the click. |
+| `title`    | `String`  | —         | Native tooltip. |
+
+```vue
+<BaseFilterChip
+  v-for="f in filters"
+  :key="f.key"
+  class="h-9 flex-1"
+  :color="f.color"
+  :active="isActive(f)"
+  :title="f.title"
+  @click="toggle(f)"
+>{{ f.label }}</BaseFilterChip>
+```
+
+### BaseCredentialsForm
+
+One service's API-credentials card: key id + secret + base/data URLs, with
+the has-secret handling (placeholder dots, blank-keeps-stored-secret), the
+save-validation ladder and a saving spinner. Load/save results are EMITTED —
+the parent owns toasts / error banners. Exposes `load()` so a parent Reload
+button can re-pull several cards in parallel.
+
+**Props:** `title` + `idPrefix` + `fetchFn: () => Promise<CredentialsView>` +
+`updateFn: (body: CredentialsUpdate) => Promise<CredentialsView>` +
+`defaults: { baseUrl, dataUrl }` (required); `subtitle`, `keyLabel`,
+`keyPlaceholder`, `secretLabel`, `secretPlaceholder`, `secretSetHint`,
+`permissionsHint`, `requiredKeyMessage`, `requiredSecretMessage`,
+`savedMessage`, `saveLabel` (optional copy overrides).
+
+**Slots:** `no-secret-hint` — rich help while no secret is stored;
+`base-url-extra` (`{ form }`) — extras under the Base URL field (e.g.
+live/paper shortcut buttons that write into the form); `footer` — extra
+content at the card's bottom.
+
+**Emits:** `saved(message)`, `error(message)`, `load-error(message)`.
+
+```vue
+<BaseCredentialsForm
+  ref="card"
+  title="Alpaca API"
+  id-prefix="alpaca"
+  :fetch-fn="fetchAlpaca"
+  :update-fn="updateAlpaca"
+  :defaults="{ baseUrl: LIVE_BASE, dataUrl: DATA_URL }"
+  @saved="onSaved"
+  @error="onError"
+  @load-error="onLoadError"
+/>
+```
+
 ---
 
 ## Composables
@@ -1339,6 +1512,8 @@ import {
   useMobileSidebar,
   useSidebarCollapse,
   useNotifications,
+  useQueryParamSync,
+  useFieldClasses,
 } from 'mgv-backoffice'
 ```
 
@@ -1353,6 +1528,8 @@ import {
 | `useMobileSidebar()` | Singleton state shared between `BaseSidebar` and `BaseAppLayout` for the off-canvas open/closed flag. |
 | `useSidebarCollapse({ storageKey? })` | Singleton collapsed/expanded state for the desktop sidebar rail, shared between `BaseSidebar` and `BaseAppLayout` and persisted to localStorage (default key `'mgv-sidebar-collapsed'`). |
 | `useNotifications()` | Singleton notification state shared by the sidebar bell and `BaseNotificationPanel`: `{ notifications, unreadCount, open, openPanel, closePanel, togglePanel, setNotifications, add, remove, markRead, markAllRead, clear }`. |
+| `useQueryParamSync()` | URL-query mirroring for filterable views: `{ qparam(name), qenum(name, allowed, fallback), replaceQuery(next) }`. Read filters from the query string once on setup, write changes back with `router.replace` (no-op when unchanged) so filtered views stay shareable without polluting history. |
+| `useFieldClasses()` | Shared form-field class strings for the gray/emerald form skin: `{ label, input, requiredInput(value) }`. `requiredInput` returns a red border+ring skin while the value is empty and the standard skin otherwise. |
 
 ---
 

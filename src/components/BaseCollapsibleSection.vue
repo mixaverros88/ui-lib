@@ -18,11 +18,17 @@
       • toggle — fired when the user clicks the header. The parent
         flips its own collapsed state in response.
   -->
-  <section class="rounded-xl border overflow-hidden transition-colors" :class="t.cardAlt">
+  <!--
+    NOTE: no `overflow-hidden` on the section — it would clip floating
+    menus (BaseDropdown) rendered near the bottom of the body. The child
+    corners are rounded explicitly instead so the card silhouette is
+    unchanged.
+  -->
+  <section class="rounded-xl border transition-colors" :class="t.cardAlt">
     <button
       type="button"
       class="w-full flex items-center justify-between p-4 text-left transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500"
-      :class="headerClasses"
+      :class="[headerClasses, collapsed ? 'rounded-xl' : 'rounded-t-xl']"
       :aria-expanded="!collapsed"
       @click="emit('toggle')"
     >
@@ -50,7 +56,7 @@
     </button>
     <div
       v-show="!collapsed"
-      class="p-6 border-t"
+      class="p-6 border-t rounded-b-xl"
       :class="[t.border, resolvedBodyClass]"
     >
       <slot />

@@ -33,6 +33,9 @@ export { default as BaseCopyButton } from './components/BaseCopyButton.vue'
 export { default as BaseGoogleSignInButton } from './components/BaseGoogleSignInButton.vue'
 export { default as BaseLoginForm } from './components/BaseLoginForm.vue'
 export { default as BaseNotificationPanel } from './components/BaseNotificationPanel.vue'
+export { default as BaseChipButton } from './components/BaseChipButton.vue'
+export { default as BaseRemoveButton } from './components/BaseRemoveButton.vue'
+export { default as BaseStatusPill } from './components/BaseStatusPill.vue'
 
 // Components — extracted from TradeAutomation
 export { default as BaseInput } from './components/BaseInput.vue'
@@ -41,6 +44,10 @@ export { default as BaseDropdown } from './components/BaseDropdown.vue'
 export { default as BaseSegmentedControl } from './components/BaseSegmentedControl.vue'
 export { default as BaseTable } from './components/BaseTable.vue'
 export { default as BaseSpecFields } from './components/BaseSpecFields.vue'
+export { default as BaseStatBreakdown } from './components/BaseStatBreakdown.vue'
+export { default as BaseFilterChip } from './components/BaseFilterChip.vue'
+export { default as BaseCredentialsForm } from './components/BaseCredentialsForm.vue'
+export type { CredentialsView, CredentialsUpdate } from './components/BaseCredentialsForm.vue'
 
 // Composables
 export { useTheme, initTheme } from './composables/useTheme'
@@ -54,6 +61,9 @@ export { useMobileSidebar } from './composables/useMobileSidebar'
 export { useSidebarCollapse } from './composables/useSidebarCollapse'
 export type { UseSidebarCollapseOptions } from './composables/useSidebarCollapse'
 export { useNotifications } from './composables/useNotifications'
+export { useQueryParamSync } from './composables/useQueryParamSync'
+export { useFieldClasses } from './composables/useFieldClasses'
+export type { FieldClasses } from './composables/useFieldClasses'
 
 // Enums
 export { AlertEnum } from './enums/AlertEnum'
@@ -77,24 +87,36 @@ export type { SegmentedOption } from './types/segmented'
 export type { DropdownOption } from './types/dropdown'
 export type { TableColumn } from './types/table'
 export type { SpecField, SpecFieldType, SpecFieldValue } from './types/specField'
+export type { StatBreakdownItem } from './types/statBreakdown'
 
 // Utils
 export { getBaseColor, getBaseColorOf } from './utils/util'
 export {
   methodBadgeSolid,
   methodBadgeBright,
+  methodBadgeTinted,
   statusBadgeSolid,
   statusBadgeTinted,
+  statusBadgeSoft,
 } from './utils/httpColors'
+export { rowKeyMissing, rowValueMissing } from './utils/kvRows'
+export type { KeyValueRowLike } from './utils/kvRows'
 export { sanitizeHtml, isSafeHref } from './utils/sanitizeHtml'
 export {
   fmtNumber,
   fmtDate,
   fmtDateTime,
+  fmtDateTimeMs,
   fmtDateShort,
+  fmtCalendarDate,
+  fmtCalendarDateTime,
+  fmtMsAsSeconds,
+  fmtBytes,
   fmtPrice,
   fmtPct,
   fmtUsd,
+  fmtDuration,
 } from './utils/format'
+export { buildSpecParams, firstInvalidNumericSpec } from './utils/specForm'
 export { computePnL } from './utils/pnl'
 export type { PnL, PnLInputs } from './utils/pnl'

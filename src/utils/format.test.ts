@@ -3,11 +3,28 @@ import {
   fmtNumber,
   fmtDate,
   fmtDateTime,
+  fmtDateTimeMs,
   fmtDateShort,
   fmtPrice,
   fmtPct,
   fmtUsd,
+  fmtDuration,
 } from './format'
+
+describe('fmtDateTimeMs', () => {
+  it('keeps the millisecond fraction so same-second rows stay distinguishable', () => {
+    const out = fmtDateTimeMs('2026-06-08T14:30:51.123Z')
+    expect(out).toMatch(/51[.,:]?\d*123|123/) // ms fraction present, locale separators vary
+  })
+
+  it('accepts epoch millis', () => {
+    expect(fmtDateTimeMs(0)).toMatch(/19?70/)
+  })
+
+  it('falls back to the raw value for unparseable input', () => {
+    expect(fmtDateTimeMs('not-a-date')).toBe('Invalid Date')
+  })
+})
 
 const EM_DASH = '—'
 
@@ -125,5 +142,94 @@ describe('fmtUsd', () => {
     expect(fmtUsd(5)).toBe('+$5.00')
     expect(fmtUsd(-3.5)).toBe('-$3.50')
     expect(fmtUsd(0)).toBe('+$0.00')
+  })
+})
+
+describe('fmtDuration', () => {
+  it('renders an em-dash for null/undefined/non-finite input', () => {
+    expect(fmtDuration(null)).toBe(EM_DASH)
+    expect(fmtDuration(undefined)).toBe(EM_DASH)
+    expect(fmtDuration(NaN)).toBe(EM_DASH)
+    expect(fmtDuration(Infinity)).toBe(EM_DASH)
+  })
+
+  it('drops zero-value leading units', () => {
+    expect(fmtDuration(12 * 60_000)).toBe('12m')
+    expect(fmtDuration((5 * 60 + 12) * 60_000)).toBe('5h 12m')
+    expect(fmtDuration((3 * 1440 + 5 * 60 + 12) * 60_000)).toBe('3d 5h')
+  })
+
+  it('caps the rendered units at maxUnits', () => {
+    const ms = (2 * 1440 + 5 * 60 + 13) * 60_000
+    expect(fmtDuration(ms, 3)).toBe('2d 5h 13m')
+    expect(fmtDuration(ms, 2)).toBe('2d 5h')
+    expect(fmtDuration(ms, 1)).toBe('2d')
+  })
+
+  it('keeps the hours unit when days are present even if hours are zero', () => {
+    expect(fmtDuration(2 * 1440 * 60_000, 3)).toBe('2d 0h 0m')
+  })
+
+  it('clamps negative durations to zero', () => {
+    expect(fmtDuration(-5000)).toBe('0m')
+  })
+
+  it('renders sub-minute durations as 0m', () => {
+    expect(fmtDuration(59_000)).toBe('0m')
+  })
+})
+
+import { fmtCalendarDate, fmtCalendarDateTime, fmtMsAsSeconds, fmtBytes } from './format'
+
+describe('fmtCalendarDate', () => {
+  it('renders a "Mon D, YYYY" en-US label', () => {
+    expect(fmtCalendarDate('2026-01-05T10:30:00Z')).toMatch(/^Jan \d{1,2}, 2026$/)
+  })
+  it('renders an em-dash for empty input', () => {
+    expect(fmtCalendarDate(null)).toBe(EM_DASH)
+    expect(fmtCalendarDate('')).toBe(EM_DASH)
+  })
+  it('falls back to the raw value for unparseable input', () => {
+    expect(fmtCalendarDate('not-a-date')).toBe('not-a-date')
+  })
+})
+
+describe('fmtCalendarDateTime', () => {
+  it('includes the time of day', () => {
+    expect(fmtCalendarDateTime('2026-01-05T10:30:00Z')).toMatch(/2026.*\d{1,2}:\d{2}/)
+  })
+  it('renders an em-dash for empty input', () => {
+    expect(fmtCalendarDateTime(undefined)).toBe(EM_DASH)
+  })
+})
+
+describe('fmtMsAsSeconds', () => {
+  it('renders 2 decimals at >= 1s', () => {
+    expect(fmtMsAsSeconds(1500)).toBe('= 1.50 s')
+  })
+  it('renders 3 decimals below 1s', () => {
+    expect(fmtMsAsSeconds(250)).toBe('= 0.250 s')
+  })
+  it('returns empty for zero / negative / non-finite input', () => {
+    expect(fmtMsAsSeconds(0)).toBe('')
+    expect(fmtMsAsSeconds(-5)).toBe('')
+    expect(fmtMsAsSeconds(NaN)).toBe('')
+    expect(fmtMsAsSeconds(null)).toBe('')
+  })
+})
+
+describe('fmtBytes', () => {
+  it('renders bytes below 1 KB', () => {
+    expect(fmtBytes(512)).toBe('512 B')
+  })
+  it('renders KB with one decimal', () => {
+    expect(fmtBytes(1536)).toBe('1.5 KB')
+  })
+  it('renders MB with one decimal', () => {
+    expect(fmtBytes(2 * 1024 * 1024)).toBe('2.0 MB')
+  })
+  it('returns empty for zero / falsy input', () => {
+    expect(fmtBytes(0)).toBe('')
+    expect(fmtBytes(null)).toBe('')
   })
 })

@@ -25,12 +25,14 @@
       :aria-expanded="open"
       @click="toggle"
     >
-      <span :class="selectedOption ? '' : 'text-slate-400 dark:text-slate-500'">
+      <!-- min-w-0 + truncate so long labels ellipsize inside narrow
+           (fixed-column) triggers instead of wrapping or widening them. -->
+      <span class="min-w-0 truncate" :class="selectedOption ? '' : 'text-slate-400 dark:text-slate-500'">
         {{ selectedOption ? selectedOption.label : placeholder }}
       </span>
       <ChevronDownIcon
-        class="w-5 h-5 shrink-0 text-slate-500 dark:text-slate-400 transition-transform"
-        :class="open ? 'rotate-180' : ''"
+        class="shrink-0 transition-transform"
+        :class="[chevronClass, open ? 'rotate-180' : '']"
         aria-hidden="true"
       />
     </button>
@@ -39,7 +41,7 @@
       v-if="open"
       role="listbox"
       :aria-label="ariaLabel || placeholder"
-      class="absolute z-20 mt-1 w-full max-h-60 overflow-auto rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 py-1 shadow-lg focus:outline-none"
+      class="absolute z-20 mt-1 w-full min-w-max max-w-xs max-h-60 overflow-auto rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 py-1 shadow-lg focus:outline-none"
     >
       <li
         v-for="opt in options"
@@ -83,6 +85,15 @@ interface Props {
   disabled?: boolean
   /** Accessible name for the trigger/listbox when there is no visible label. */
   ariaLabel?: string
+  /**
+   * Replaces the trigger's default slate skin (border/background/text/padding)
+   * with the given classes — layout, focus ring and disabled classes are kept.
+   * Lets a consumer render the trigger as e.g. a coloured status pill while
+   * keeping the shared menu behaviour. `size` is ignored when this is set.
+   */
+  triggerClass?: string
+  /** Chevron sizing/colour classes; shrink for compact triggers. */
+  chevronClass?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -92,6 +103,8 @@ const props = withDefaults(defineProps<Props>(), {
   block: true,
   disabled: false,
   ariaLabel: '',
+  triggerClass: '',
+  chevronClass: 'w-5 h-5 text-slate-500 dark:text-slate-400',
 })
 
 const emit = defineEmits<{
@@ -107,12 +120,17 @@ const selectedOption = computed(() =>
 )
 
 const triggerClass = computed(() => {
+  const layout =
+    'flex items-center justify-between gap-2 text-left transition-colors ' +
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ' +
+    'cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed '
+  if (props.triggerClass) return layout + props.triggerClass
   const padding = props.size === 'sm' ? 'px-3 py-2' : 'px-4 py-2.5'
   return (
-    'flex items-center justify-between gap-2 rounded-lg border text-left text-sm transition-colors ' +
+    layout +
+    'rounded-lg border text-sm ' +
     'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-100 ' +
-    'hover:bg-slate-50 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ' +
-    'cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ' +
+    'hover:bg-slate-50 dark:hover:bg-slate-800 ' +
     padding
   )
 })
