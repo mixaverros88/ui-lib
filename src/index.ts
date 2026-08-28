@@ -36,6 +36,7 @@ export { default as BaseNotificationPanel } from './components/BaseNotificationP
 export { default as BaseChipButton } from './components/BaseChipButton.vue'
 export { default as BaseRemoveButton } from './components/BaseRemoveButton.vue'
 export { default as BaseStatusPill } from './components/BaseStatusPill.vue'
+export { default as BaseFileDropzone } from './components/BaseFileDropzone.vue'
 
 // Components — extracted from TradeAutomation
 export { default as BaseInput } from './components/BaseInput.vue'

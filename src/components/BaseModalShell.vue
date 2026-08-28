@@ -4,8 +4,14 @@
     backdrop, dark-mode card, escape key, aria-modal). Concrete modals
     should compose this rather than re-implementing the chrome.
 
+    Every modal shows an icon left of the title: the REQUIRED `icon`
+    prop (a component, e.g. a heroicon) renders inside a tinted
+    circular chip. Tint via `icon-bg-class` / `icon-class`; the `icon`
+    slot remains as a full-markup override for callers that need
+    something richer than the standard chip.
+
     Slots:
-      • icon    — small circular icon shown next to the title
+      • icon    — override the standard icon chip next to the title
       • default — body content
       • footer  — action buttons (cancel / confirm / etc.)
 
@@ -37,7 +43,14 @@
       >
         <div class="flex items-start justify-between gap-4 p-6 border-b shrink-0" :class="t.border">
           <div class="flex items-start gap-4 min-w-0">
-            <slot name="icon" />
+            <slot name="icon">
+              <div
+                class="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-full"
+                :class="iconChipBg"
+              >
+                <component :is="icon" class="h-6 w-6" :class="iconClass" aria-hidden="true" />
+              </div>
+            </slot>
             <div class="flex-1 min-w-0">
               <h3 :id="titleId" class="text-lg font-medium" :class="t.primaryText">
                 {{ title }}
@@ -69,7 +82,14 @@
         <div class="p-6">
           <!-- Title row -->
           <div class="flex items-start gap-4">
-            <slot name="icon" />
+            <slot name="icon">
+              <div
+                class="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-full"
+                :class="iconChipBg"
+              >
+                <component :is="icon" class="h-6 w-6" :class="iconClass" aria-hidden="true" />
+              </div>
+            </slot>
             <div class="flex-1">
               <h3
                 :id="titleId"
@@ -98,12 +118,26 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { Component } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import { useThemeClasses } from '../composables/useThemeClasses'
 import { useEscapeKey } from '../composables/useEscapeKey'
 
 interface Props {
   title: string
+  /**
+   * Icon component (e.g. a heroicon) rendered in a tinted circular
+   * chip left of the title. REQUIRED — every modal must name itself
+   * with an icon. The `icon` slot can override the whole chip.
+   */
+  icon: Component
+  /**
+   * Background classes of the icon chip. Defaults to the emerald
+   * tint (dark-mode aware).
+   */
+  iconBgClass?: string
+  /** Classes applied to the icon itself. Defaults to emerald. */
+  iconClass?: string
   /**
    * Max-width of the dialog card. Defaults to `max-w-md`. Pass any
    * Tailwind max-w utility, or empty string to opt out.
@@ -135,6 +169,8 @@ const props = withDefaults(defineProps<Props>(), {
   manualClose: false,
   scrollable: false,
   subtitle: '',
+  iconBgClass: '',
+  iconClass: 'text-emerald-600',
 })
 
 const emit = defineEmits<{
@@ -154,6 +190,12 @@ const shellClass = computed(() =>
   isDark.value
     ? 'bg-gray-900 border border-gray-700'
     : 'bg-white border border-gray-200',
+)
+
+// The icon chip's background: an explicit `icon-bg-class` wins, else the
+// standard emerald tint in the current theme.
+const iconChipBg = computed(() =>
+  props.iconBgClass || (isDark.value ? 'bg-emerald-900/30' : 'bg-emerald-50'),
 )
 
 function onBackdrop() {

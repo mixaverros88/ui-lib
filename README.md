@@ -1272,6 +1272,40 @@ short label on a tinted background.
 
 ---
 
+### BaseFileDropzone
+
+Dashed "click to select a file" upload zone (extracted from WireMate's
+Postman-import modal). Renders a document-arrow-up icon (overridable via the
+`#icon` slot), a label line, and an optional dimmed hint line. Clicking opens
+the native file picker; dragging files onto the zone also works (the border
+highlights emerald while dragging). The hidden input resets after every
+selection, so picking the same file twice still emits.
+
+**Props:**
+
+| Prop       | Type      | Default | Description |
+| ---------- | --------- | ------- | ----------- |
+| `label`    | `String`  | **required** | Main line, e.g. `Click to select a Postman collection (.json)`. |
+| `hint`     | `String`  | `''`    | Dimmed helper line below the label. |
+| `accept`   | `String`  | `''`    | Forwarded to the input's `accept`. Dropped files are **not** filtered by it. |
+| `multiple` | `Boolean` | `false` | Allow multi-select; when `false`, a multi-file drop emits only the first file. |
+| `disabled` | `Boolean` | `false` | Dims the zone and ignores clicks/drops. |
+
+**Emits:** `files` (`File[]`, never empty).
+
+**Slots:** `icon` — replaces the default upload icon.
+
+```vue
+<BaseFileDropzone
+  accept="application/json,.json"
+  label="Click to select a Postman collection (.json)"
+  hint="Exported from Postman → Export → Collection v2.1"
+  @files="onFiles"
+/>
+```
+
+---
+
 ## Forms & tables
 
 These components use `dark:` Tailwind variants, so the consuming app must map
@@ -1532,6 +1566,22 @@ import {
 | `useFieldClasses()` | Shared form-field class strings for the gray/emerald form skin: `{ label, input, requiredInput(value) }`. `requiredInput` returns a red border+ring skin while the value is empty and the standard skin otherwise. |
 
 ---
+
+## Typography
+
+Since 1.33.0 the library ships the shared brand typography: the stylesheet
+loads **Fira Sans** (UI text) and **Fira Code** (numerals/data) from Google
+Fonts via `@import`, registers them as the Tailwind `--font-sans` /
+`--font-mono` theme defaults, and applies `font-family: var(--font-sans)` to
+`body`. Consumers get the fonts just by importing the lib CSS — remove any
+app-local Google Fonts `<link rel="stylesheet">` and `--font-sans`/`--font-mono`
+overrides. Keep (or add) the preconnect hints in `index.html` for a faster
+first paint:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+```
 
 ## Tailwind setup for consumers
 

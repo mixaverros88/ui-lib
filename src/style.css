@@ -1,4 +1,20 @@
+/* Brand typography, shipped by the library so every consumer renders the same:
+   Fira Sans for UI text, Fira Code for numerals/data. External @import (kept
+   first — CSS ignores @import after any other rule); consumers should add
+   <link rel="preconnect"> hints for fonts.googleapis.com / fonts.gstatic.com
+   in their index.html for faster first paint. */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
+
 @import "tailwindcss";
+
+/* Register the fonts as the Tailwind theme defaults. The compiled stylesheet
+   re-declares theme variables in its :root, so in consumers that import this
+   file after their own `@import "tailwindcss"` these values win the cascade
+   for font-sans/font-mono utilities AND the body rule below. */
+@theme {
+  --font-sans: 'Fira Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
 
 /* Compile `dark:` variants against the `.dark` class that useTheme()/initTheme()
    toggle on <html> — NOT the OS-level prefers-color-scheme media query
@@ -8,3 +24,9 @@
    Use a specificity-bearing selector (:is, not :where) so dark: utilities win
    over plain base utilities like bg-slate-50 on a cascade tie. */
 @custom-variant dark (&:is(.dark, .dark *));
+
+/* Apply the brand font app-wide. Plain body rule (not preflight-dependent) so
+   it also styles consumers whose own Tailwind preflight came earlier. */
+body {
+  font-family: var(--font-sans);
+}

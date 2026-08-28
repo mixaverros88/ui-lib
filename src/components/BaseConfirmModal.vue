@@ -1,26 +1,14 @@
 <template>
   <BaseModalShell
     :title="title"
+    :icon="ExclamationTriangleIcon"
+    :icon-bg-class="variant === 'danger'
+      ? isDark ? 'bg-red-900/30' : 'bg-red-50'
+      : isDark ? 'bg-amber-900/30' : 'bg-amber-50'"
+    :icon-class="variant === 'danger' ? 'text-red-600' : 'text-amber-600'"
     :manual-close="submitting"
     @cancel="handleCancel"
   >
-    <template #icon>
-      <div
-        class="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-full"
-        :class="[
-          variant === 'danger'
-            ? isDark ? 'bg-red-900/30' : 'bg-red-50'
-            : isDark ? 'bg-amber-900/30' : 'bg-amber-50'
-        ]"
-      >
-        <ExclamationTriangleIcon
-          class="h-6 w-6"
-          :class="variant === 'danger' ? 'text-red-600' : 'text-amber-600'"
-          aria-hidden="true"
-        />
-      </div>
-    </template>
-
     <!--
       Default renders the plain `message` string. Callers that need rich
       text (bold names, inline code, etc.) can override the `message` slot

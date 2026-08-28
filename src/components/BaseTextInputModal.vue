@@ -12,18 +12,14 @@
   -->
   <BaseModalShell
     :title="title"
+    :icon="DocumentDuplicateIcon"
     manual-close
     @backdrop="handleBackdropClick"
   >
-    <template #icon>
-      <slot name="icon">
-        <div
-          class="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-full"
-          :class="isDark ? 'bg-emerald-900/30' : 'bg-emerald-50'"
-        >
-          <DocumentDuplicateIcon class="h-6 w-6 text-emerald-600" aria-hidden="true" />
-        </div>
-      </slot>
+    <!-- Forward a caller-supplied icon override; otherwise the shell
+         renders the default document icon in the standard emerald chip. -->
+    <template v-if="$slots.icon" #icon>
+      <slot name="icon" />
     </template>
 
     <p class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-600'">

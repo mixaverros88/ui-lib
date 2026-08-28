@@ -1,18 +1,16 @@
 <template>
   <BaseModalShell
     :title="title"
+    :icon="FolderIcon"
+    :icon-bg-class="palette.iconBg"
+    :icon-class="palette.iconText"
     :manual-close="submitting"
     @cancel="handleCancel"
   >
-    <template #icon>
-      <slot name="icon">
-        <div
-          class="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-full"
-          :class="palette.iconBg"
-        >
-          <FolderIcon class="h-6 w-6" :class="palette.iconText" aria-hidden="true" />
-        </div>
-      </slot>
+    <!-- Forward a caller-supplied icon override; otherwise the shell
+         renders the default folder icon in the palette-tinted chip. -->
+    <template v-if="$slots.icon" #icon>
+      <slot name="icon" />
     </template>
 
     <p v-if="message" class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
