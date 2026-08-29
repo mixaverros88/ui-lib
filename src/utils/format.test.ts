@@ -9,6 +9,8 @@ import {
   fmtPct,
   fmtUsd,
   fmtDuration,
+  formatJson,
+  stringifyValue,
 } from './format'
 
 describe('fmtDateTimeMs', () => {
@@ -231,5 +233,32 @@ describe('fmtBytes', () => {
   it('returns empty for zero / falsy input', () => {
     expect(fmtBytes(0)).toBe('')
     expect(fmtBytes(null)).toBe('')
+  })
+})
+
+describe('formatJson', () => {
+  it('pretty-prints parseable JSON with 2-space indentation', () => {
+    expect(formatJson('{"a":1,"b":[2,3]}')).toBe('{\n  "a": 1,\n  "b": [\n    2,\n    3\n  ]\n}')
+  })
+  it('returns non-JSON input verbatim', () => {
+    expect(formatJson('plain text')).toBe('plain text')
+    expect(formatJson('<xml/>')).toBe('<xml/>')
+    expect(formatJson('')).toBe('')
+  })
+})
+
+describe('stringifyValue', () => {
+  it('passes strings through and blanks null/undefined', () => {
+    expect(stringifyValue('abc')).toBe('abc')
+    expect(stringifyValue(null)).toBe('')
+    expect(stringifyValue(undefined)).toBe('')
+  })
+  it('JSON-serializes objects, arrays and numbers', () => {
+    expect(stringifyValue({ a: 1 })).toBe('{"a":1}')
+    expect(stringifyValue([1, 2])).toBe('[1,2]')
+    expect(stringifyValue(42)).toBe('42')
+  })
+  it('falls back to String() when JSON.stringify throws', () => {
+    expect(stringifyValue(1n)).toBe('1')
   })
 })

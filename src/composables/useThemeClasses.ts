@@ -1,4 +1,4 @@
-import { computed, type ComputedRef } from 'vue'
+import { computed, reactive } from 'vue'
 import { useTheme } from './useTheme'
 
 /**
@@ -14,69 +14,73 @@ import { useTheme } from './useTheme'
  *     <p :class="t.mutedText">...</p>
  *   </div>
  *
- * Vue auto-unwraps the computed refs inside template `:class` bindings,
- * so callers do not write `.value`.
+ * The returned object is `reactive()`, so property access yields the
+ * plain class string while staying reactive to theme flips. (It used to
+ * be a plain object of ComputedRefs — Vue does NOT unwrap refs nested in
+ * plain objects inside template bindings, so `:class="t.card"` rendered
+ * the ref's own keys — `fn dep __v_isRef …` — instead of the classes.)
+ * Property access is string-valued now: do not append `.value`.
  */
 export interface ThemeClasses {
   // -- Surfaces --
   /** Card surface: bg-gray-800 / bg-white, with border. */
-  card: ComputedRef<string>
+  card: string
   /** Slightly darker card surface: bg-gray-900 / bg-white, with border. */
-  cardAlt: ComputedRef<string>
+  cardAlt: string
   /** Page background. */
-  pageBg: ComputedRef<string>
+  pageBg: string
 
   // -- Borders --
   /** Standard border between cards/sections. */
-  border: ComputedRef<string>
+  border: string
   /** Subtle divider (lighter than border). */
-  divider: ComputedRef<string>
+  divider: string
 
   // -- Text hierarchy --
   /** Page headings: white / gray-900. */
-  primaryText: ComputedRef<string>
+  primaryText: string
   /** Softer headings: gray-100 / gray-800. */
-  primaryTextSoft: ComputedRef<string>
+  primaryTextSoft: string
   /** Body copy on cards: gray-200 / gray-700. */
-  bodyText: ComputedRef<string>
+  bodyText: string
   /** Form labels: gray-300 / gray-700. */
-  label: ComputedRef<string>
+  label: string
   /** Secondary text: gray-400 / gray-600. */
-  mutedText: ComputedRef<string>
+  mutedText: string
   /** Tertiary text: gray-500 / gray-600. */
-  subtleText: ComputedRef<string>
+  subtleText: string
   /** Dimmest text: gray-500 in dark / gray-400 in light. */
-  dimText: ComputedRef<string>
+  dimText: string
   /** Slightly more contrast than dimText: gray-400 / gray-500. */
-  dimTextAlt: ComputedRef<string>
+  dimTextAlt: string
   /** Big illustration / empty-state icon: gray-600 / gray-300. */
-  illustration: ComputedRef<string>
+  illustration: string
 
   // -- Inputs --
   /** Standard text input. */
-  input: ComputedRef<string>
+  input: string
   /** Input + placeholder colour. */
-  inputWithPlaceholder: ComputedRef<string>
+  inputWithPlaceholder: string
 
   // -- Buttons --
   /** Ghost / Cancel button. */
-  ghostButton: ComputedRef<string>
+  ghostButton: string
 
   // -- Accent text colours --
   /** Emerald accent text: emerald-400 / emerald-600. */
-  emeraldText: ComputedRef<string>
+  emeraldText: string
   /** Amber accent text: amber-400 / amber-600. */
-  amberText: ComputedRef<string>
+  amberText: string
   /** Amber heading-weight: amber-300 / amber-700. */
-  amberTextStrong: ComputedRef<string>
+  amberTextStrong: string
   /** Red accent text: red-400 / red-500. */
-  redText: ComputedRef<string>
+  redText: string
 }
 
 export function useThemeClasses(): ThemeClasses {
   const { isDark } = useTheme()
 
-  return {
+  return reactive({
     card: computed(() =>
       isDark.value
         ? 'bg-gray-800 border-gray-700'
@@ -129,5 +133,5 @@ export function useThemeClasses(): ThemeClasses {
       isDark.value ? 'text-amber-300' : 'text-amber-700',
     ),
     redText: computed(() => (isDark.value ? 'text-red-400' : 'text-red-500')),
-  }
+  })
 }

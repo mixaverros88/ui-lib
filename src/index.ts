@@ -37,6 +37,7 @@ export { default as BaseChipButton } from './components/BaseChipButton.vue'
 export { default as BaseRemoveButton } from './components/BaseRemoveButton.vue'
 export { default as BaseStatusPill } from './components/BaseStatusPill.vue'
 export { default as BaseFileDropzone } from './components/BaseFileDropzone.vue'
+export { default as BaseCodeBlock } from './components/BaseCodeBlock.vue'
 
 // Components — extracted from TradeAutomation
 export { default as BaseInput } from './components/BaseInput.vue'
@@ -48,6 +49,7 @@ export { default as BaseSpecFields } from './components/BaseSpecFields.vue'
 export { default as BaseStatBreakdown } from './components/BaseStatBreakdown.vue'
 export { default as BaseFilterChip } from './components/BaseFilterChip.vue'
 export { default as BaseCredentialsForm } from './components/BaseCredentialsForm.vue'
+export { default as BasePillPickerModal } from './components/BasePillPickerModal.vue'
 export type { CredentialsView, CredentialsUpdate } from './components/BaseCredentialsForm.vue'
 
 // Composables
@@ -65,6 +67,8 @@ export { useNotifications } from './composables/useNotifications'
 export { useQueryParamSync } from './composables/useQueryParamSync'
 export { useFieldClasses } from './composables/useFieldClasses'
 export type { FieldClasses } from './composables/useFieldClasses'
+export { usePolling } from './composables/usePolling'
+export type { UsePollingOptions } from './composables/usePolling'
 
 // Enums
 export { AlertEnum } from './enums/AlertEnum'
@@ -89,6 +93,7 @@ export type { DropdownOption } from './types/dropdown'
 export type { TableColumn } from './types/table'
 export type { SpecField, SpecFieldType, SpecFieldValue } from './types/specField'
 export type { StatBreakdownItem } from './types/statBreakdown'
+export type { PillPickerItem } from './types/pillPicker'
 
 // Utils
 export { getBaseColor, getBaseColorOf } from './utils/util'
@@ -117,7 +122,15 @@ export {
   fmtPct,
   fmtUsd,
   fmtDuration,
+  formatJson,
+  stringifyValue,
 } from './utils/format'
+export {
+  isValidAbsoluteUrl,
+  isValidJson,
+  isValidXml,
+  isValidBase64,
+} from './utils/validate'
 export { buildSpecParams, firstInvalidNumericSpec } from './utils/specForm'
 export { computePnL } from './utils/pnl'
 export type { PnL, PnLInputs } from './utils/pnl'

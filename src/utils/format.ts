@@ -169,6 +169,34 @@ export function fmtBytes(bytes: number | null | undefined): string {
 }
 
 /**
+ * Pretty-print a string that may contain JSON: parseable input is
+ * re-serialized with 2-space indentation, anything else is returned
+ * verbatim. Handy for request/response bodies of unknown content type.
+ */
+export function formatJson(content: string): string {
+  try {
+    return JSON.stringify(JSON.parse(content), null, 2)
+  } catch {
+    return content
+  }
+}
+
+/**
+ * Render an unknown value as a display string: strings pass through,
+ * null/undefined become '', everything else is JSON-serialized (falling
+ * back to String() for values JSON can't handle, e.g. cycles or BigInt).
+ */
+export function stringifyValue(value: unknown): string {
+  if (value === null || value === undefined) return ''
+  if (typeof value === 'string') return value
+  try {
+    return JSON.stringify(value)
+  } catch {
+    return String(value)
+  }
+}
+
+/**
  * Format a millisecond duration as compact day/hour/minute units, e.g.
  * "3d 5h", "5h 12m" or "12m". Zero-value leading units are dropped;
  * `maxUnits` caps how many units render (2 → "3d 5h", 3 → "3d 5h 12m").

@@ -669,6 +669,24 @@ Consistency checks for dynamic key/value grids (header lists, query params,
 metadata rows). Rows with `matcherType: 'absent'` are exempt — an absent
 matcher intentionally carries no value.
 
+### Input validators
+
+```ts
+import { isValidAbsoluteUrl, isValidJson, isValidXml, isValidBase64 } from 'mgv-backoffice'
+```
+
+Pure, dependency-free form-input validators. The payload validators treat
+empty/whitespace-only input as **valid** — required-ness is a separate rule
+from well-formedness; `isValidAbsoluteUrl` validates a value that must exist,
+so empty is invalid there.
+
+| Function             | Signature                    | Returns |
+| -------------------- | ---------------------------- | ------- |
+| `isValidAbsoluteUrl` | `(value: string) => boolean` | `true` for an absolute `http://` / `https://` URL (other schemes rejected). |
+| `isValidJson`        | `(str: string) => boolean`   | `true` when empty or parseable as JSON. |
+| `isValidXml`         | `(str: string) => boolean`   | `true` when empty or well-formed XML (DOMParser `<parsererror>` check; browser-only). |
+| `isValidBase64`      | `(str: string) => boolean`   | `true` when empty or well-formed base64 (whitespace stripped, length/alphabet checked, then `atob` as the final authority). |
+
 ### HTML sanitizer
 
 ```ts
@@ -724,6 +742,8 @@ API values can be passed without pre-sanitising.
 | `fmtPrice`     | `(n: number) => string`                                         | Price with precision that scales to magnitude (more decimals for sub-cent values). |
 | `fmtPct`       | `(n: number, digits = 2) => string`                             | Percentage with explicit sign, e.g. `"+2.50%"`. |
 | `fmtUsd`       | `(v: number) => string`                                         | Signed USD amount with leading sign, e.g. `"+$5.00"`. |
+| `formatJson`   | `(content: string) => string`                                   | Pretty-prints parseable JSON with 2-space indentation; returns anything else verbatim. |
+| `stringifyValue` | `(value: unknown) => string`                                  | Display string for an unknown value: strings pass through, null/undefined → `''`, everything else JSON-serialized (`String()` fallback). |
 
 ### Spec-form helpers
 
@@ -1106,7 +1126,7 @@ a page header. Optional leading icon (via slot) plus a label.
 | Prop       | Type      | Default     | Description |
 | ---------- | --------- | ----------- | ----------- |
 | `label`    | `String`  | `''`        | Button text. Omit for an icon-only button. |
-| `variant`  | `String`  | `'neutral'` | `'neutral'` (grey) or `'danger'` (solid red). |
+| `variant`  | `String`  | `'neutral'` | `'neutral'` (grey), `'danger'` (solid red) or `'ghost'` (slate h-9 outline — toolbar/modal-footer buttons). |
 | `disabled` | `Boolean` | `false`     | Greys out and blocks the click. |
 | `title`    | `String`  | `undefined` | Native tooltip / a11y text. |
 | `type`     | `String`  | `'button'`  | Native button type. |
@@ -1302,6 +1322,26 @@ selection, so picking the same file twice still emits.
   hint="Exported from Postman → Export → Collection v2.1"
   @files="onFiles"
 />
+```
+
+### BaseCodeBlock
+
+Themed monospace `<pre>` for JSON payloads, request dumps and code snippets
+(extracted from WireMate's stub/request detail views). Preserves whitespace
+verbatim, scrolls both axes, and adapts to the theme. Extra classes (margins
+etc.) fall through via the normal class merge.
+
+**Props:**
+
+| Prop             | Type     | Default  | Description |
+| ---------------- | -------- | -------- | ----------- |
+| `code`           | `String` | **required** | The raw text to render. |
+| `variant`        | `String` | `'soft'` | `'soft'` = tinted fill, no border (in-card look); `'bordered'` = bordered card fill (standalone look). |
+| `size`           | `String` | `'sm'`   | `'sm'` = `text-sm px-5 py-4`; `'xs'` = dense `text-xs p-3`. |
+| `maxHeightClass` | `String` | `''`     | Optional Tailwind max-height utility, e.g. `max-h-96`. |
+
+```vue
+<BaseCodeBlock :code="formatJson(response.body)" size="xs" max-height-class="max-h-64" />
 ```
 
 ---
@@ -1533,6 +1573,46 @@ content at the card's bottom.
 
 ---
 
+### BasePillPickerModal
+
+"Pick one of many" modal: every item rendered as a clickable pill, narrowed
+by a free-text filter and an optional segmented group toggle. Clicking a pill
+emits `pick` with the item; backdrop / Escape / the footer Close emit `close`.
+Narrowing state lives inside, so a `v-if`-mounted instance always opens fresh.
+
+**Props:** `title` + `items: PillPickerItem[]` (required);
+`groups?: SegmentedOption<string>[]` (renders the group toggle with an
+`allLabel` option prepended, narrowing by each item's `group`); `icon?`
+(defaults to the magnifying glass), `subtitle?`, `searchPlaceholder`,
+`emptyMessage`, `noMatchMessage`, `mono` (mono font for the filter input and
+pills — symbols, codes, ids), `maxWidthClass` (default `max-w-2xl`),
+`closeText`, `groupAriaLabel`, `allLabel`.
+
+**Emits:** `pick(item: PillPickerItem)`, `close`.
+
+```ts
+interface PillPickerItem {
+  id: string      // unique key; identifies the pick
+  label: string   // pill text; what the filter matches
+  group?: string  // segmented-toggle bucket
+  title?: string  // pill tooltip
+}
+```
+
+```vue
+<BasePillPickerModal
+  v-if="open"
+  title="Symbols"
+  :items="symbols.map(s => ({ id: s.id, label: s.symbol, group: s.assetClass }))"
+  :groups="[{ value: 'STOCK', label: 'STOCK' }, { value: 'CRYPTO', label: 'CRYPTO' }]"
+  mono
+  @pick="apply"
+  @close="open = false"
+/>
+```
+
+---
+
 ## Composables
 
 ```ts
@@ -1548,6 +1628,7 @@ import {
   useNotifications,
   useQueryParamSync,
   useFieldClasses,
+  usePolling,
 } from 'mgv-backoffice'
 ```
 
@@ -1555,7 +1636,7 @@ import {
 | ---------- | ------- |
 | `initTheme({ storageKey? })` | Explicitly initialize the theme singleton. Call in your app entry point **before mounting** when you need a custom storage key — library components call `useTheme()` internally, so a component mounting first would otherwise lock in the default key (a dev-mode warning fires if that happens). |
 | `useTheme({ storageKey? })` | Singleton dark/light controller. Toggles `<html class="dark">` and persists via localStorage (default key `'mgv-theme'`). Prefer `initTheme` at app entry for custom keys. |
-| `useThemeClasses()` | Named Tailwind class roles for dark/light (card, border, primaryText, mutedText, dimText, input, ghostButton, emeraldText, redText, …). Returns computed refs auto-unwrapped in templates. |
+| `useThemeClasses()` | Named Tailwind class roles for dark/light (card, border, primaryText, mutedText, dimText, input, ghostButton, emeraldText, redText, …). Since 1.34.0 returns a `reactive` object of plain strings — bind `t.card` directly, never `t.card.value` (the old ComputedRef shape leaked ref internals into `:class` bindings). |
 | `useEscapeKey(handler)` | Component-scoped Escape key listener. |
 | `useDebouncedRef(source, delay?)` | Debounced mirror of a ref. Timer cleared on scope dispose. |
 | `useToast(durationMs?)` | Per-component toast state: `{ showToast, toastMessage, toastType, showToastMessage }`. |
@@ -1564,6 +1645,7 @@ import {
 | `useNotifications()` | Singleton notification state shared by the sidebar bell and `BaseNotificationPanel`: `{ notifications, unreadCount, open, openPanel, closePanel, togglePanel, setNotifications, add, remove, markRead, markAllRead, clear }`. |
 | `useQueryParamSync()` | URL-query mirroring for filterable views: `{ qparam(name), qenum(name, allowed, fallback), replaceQuery(next) }`. Read filters from the query string once on setup, write changes back with `router.replace` (no-op when unchanged) so filtered views stay shareable without polluting history. |
 | `useFieldClasses()` | Shared form-field class strings for the gray/emerald form skin: `{ label, input, requiredInput(value) }`. `requiredInput` returns a red border+ring skin while the value is empty and the standard skin otherwise. |
+| `usePolling(fn, intervalMs, { immediate?, pauseWhenHidden? })` | Visibility-gated polling loop bound to the component lifecycle: starts on mount, stops on unmount, pauses while the tab is hidden and refreshes + resumes on return to visible (both default on). Pass `intervalMs: null` for refresh-only mode (run on mount + each return-to-visible, no timer). Returns `{ start, stop, active }`. Catch errors inside `fn` — the loop never swallows rejections. |
 
 ---
 
