@@ -89,7 +89,8 @@ import { BaseAlert, AlertEnum } from 'mgv-backoffice'
 
 ### BaseBadge
 
-Colored status badge/pill.
+Colored status badge/pill. Renders nothing when the default slot is empty;
+an omitted or unrecognized `color` falls back to the red palette.
 
 **Props:**
 
@@ -116,7 +117,9 @@ import { BaseBadge, ColorsEnums } from 'mgv-backoffice'
 
 ### BaseBreadcrumb
 
-Breadcrumb navigation. Provide items manually or pass a URL path for auto-generation.
+Breadcrumb navigation. Provide items manually or pass a URL path for
+auto-generation; with neither prop it auto-generates from
+`window.location.pathname`. A "Home" crumb linking to `/` is always prepended.
 
 **Props:**
 
@@ -274,14 +277,14 @@ the default slot, and a single OK button that emits `closeModal`.
 | ------------- | -------- | ----------- |-------------------------------------|
 | `title`       | `String` | **required**| Modal heading                       |
 | `description` | `String` | —           | Body text                           |
-| `to`          | `String` | `"/"`       | Redirect path on confirm            |
+| `to`          | `String` | `"/"`       | Unused — declared for backward compatibility only; confirm just emits `confirmModal`, no navigation happens |
 | `mode`        | `String` | `'SUCCESS'` | Modal variant (use `BaseModalEnum`) |
 
 **Events:**
 
 | Event          | Description                     |
 | -------------- | ------------------------------- |
-| `closeModal`   | Emitted when modal is dismissed |
+| `closeModal`   | Emitted when modal is dismissed (cancel/OK button, backdrop click, or Escape) |
 | `confirmModal` | Emitted on confirm action       |
 
 **Example:**
@@ -316,7 +319,7 @@ Card-like content container with border and shadow.
 
 | Prop      | Type     | Default   | Description            |
 | --------- | -------- | --------- | ---------------------- |
-| `bgColor` | `String` | `"white"` | Background color class |
+| `bgColor` | `String` | `"bg-white"` | Background color — a full Tailwind class (e.g. `"bg-slate-50"`), not a bare color name |
 
 **Slots:** `default` — row content.
 
@@ -377,7 +380,8 @@ Toast notification with positioning and auto-dismiss.
 | `mode`         | `BaseToastEnum`  | **required** | Toast variant (SUCCESS, WARNING, ERROR) |
 | `description`  | `String`         | **required** | Message text                            |
 | `hasCloseIcon` | `Boolean`        | `true`    | Show close button                          |
-| `positioning`  | `String`         | `'right'` | Screen position (use `PositioningEnum`)    |
+| `positioning`  | `String`         | `PositioningEnum.TOP_RIGHT` | Screen position (use `PositioningEnum`) |
+| `duration`     | `Number`         | `5000`    | Auto-dismiss delay in milliseconds         |
 
 **Example:**
 
@@ -441,6 +445,7 @@ amounts.
 | `decimals` | `Number` | `2`                     | Fraction digits shown for the amount |
 | `accent`   | `'orange' \| 'emerald' \| 'red'` | `'orange'` | Card theme. `emerald` tints it green; `red` is the loss theme. |
 | `signed`   | `Boolean` | `false`                | Treat `amount` as a signed P&L figure: a negative value automatically switches to the `red` loss theme and flips the trend glyph to point **down**; a non-negative value keeps the chosen `accent` and the upward glyph. |
+| `compact`  | `Boolean` | `false`                | Dense variant for dashboards that tile many cards on one row: tighter padding, smaller type, trend glyph shrunk into the top-right corner. Don't combine with `badge` — both occupy the top-right corner. |
 
 **Example:**
 
@@ -480,7 +485,7 @@ Formatted euro currency display with conditional color coding.
 | Prop           | Type      | Default | Description                                     |
 | -------------- | --------- | ------- |-------------------------------------------------|
 | `amount`       | `Number`  | —       | Value to display                                |
-| `beforeAmount` | `Number`  | `null`  | Previous value (green if amount > beforeAmount) |
+| `beforeAmount` | `Number`  | `null`  | Previous value: red if `amount < beforeAmount`, green if `amount >= beforeAmount`. When omitted, a non-negative amount renders neutral (never green); a negative amount is always red. |
 | `showCurrency` | `Boolean` | `true`  | Show euro symbol                                |
 
 **Example:**
@@ -512,7 +517,7 @@ Page navigation with smart ellipsis for large page counts.
 
 | Prop           | Type     | Default | Description             |
 | -------------- | -------- | ------- | ----------------------- |
-| `totalItems`   | `Number` | `10`    | Total number of items   |
+| `totalItems`   | `Number` | **required** | Total number of items   |
 | `itemsPerPage` | `Number` | `20`    | Items shown per page    |
 
 **Events:**
@@ -607,7 +612,7 @@ import {
 ## Types
 
 ```ts
-import type { BreadCrumb, PnL, PnLInputs } from 'mgv-backoffice'
+import type { BreadCrumb, DropdownOption, PnL, PnLInputs } from 'mgv-backoffice'
 ```
 
 | Type             | Shape                                  |
@@ -616,6 +621,12 @@ import type { BreadCrumb, PnL, PnLInputs } from 'mgv-backoffice'
 | `DropdownOption` | `{ value: string \| number; label: string; title?: string; disabled?: boolean }` |
 | `PnLInputs`      | `{ buyPrice; lastPrice; filledQty }` (each `number \| string \| null \| undefined`) |
 | `PnL`            | `{ pnlUsd: number \| null; pnlPct: number \| null }` |
+
+The other exported types — `NavItem`, `NavSection`, `EntityPickerItem`,
+`LoginCredentials`, `NotificationItem`, `SegmentedOption`, `TableColumn`,
+`SpecField`, `SpecFieldType`, `SpecFieldValue`, `StatBreakdownItem`,
+`PillPickerItem`, `DistributionBar`, `CredentialsView`, `CredentialsUpdate` —
+are documented in their component's section.
 
 ---
 
@@ -658,6 +669,7 @@ companion keyed by status class (emerald 2xx / sky 3xx / amber 4xx / red 5xx).
 
 ```ts
 import { rowKeyMissing, rowValueMissing } from 'mgv-backoffice'
+import type { KeyValueRowLike } from 'mgv-backoffice'
 ```
 
 | Function          | Signature                                                              | Returns |
@@ -696,14 +708,15 @@ import { sanitizeHtml, isSafeHref } from 'mgv-backoffice'
 | Function       | Signature                                       | Returns |
 | -------------- | ----------------------------------------------- | ------- |
 | `sanitizeHtml` | `(raw: string \| undefined \| null) => string`  | Allow-list–sanitised HTML safe for `v-html`. |
-| `isSafeHref`   | `(value: string) => boolean`                    | `true` if the href uses a safe scheme (http/https/mailto/tel, root-relative, or anchor). |
+| `isSafeHref`   | `(value: string) => boolean`                    | `true` if the href uses a safe scheme (http/https/mailto/tel, root-relative, or anchor) or is empty/whitespace-only. |
 
 Allow-list sanitizer for strings bound into `v-html`. Keeps a small set of
 formatting tags (`a`, `b`/`strong`, `i`/`em`, `code`, `pre`, `p`, `ul`/`ol`/`li`,
 `span`, `div`, `br`), strips all other elements (unwrapping to text, or dropping
 content entirely for `script`/`style`/`iframe`/etc.), removes every attribute
-except `href`/`title` on anchors, rejects unsafe href schemes
-(`javascript:`/`data:`/`vbscript:`/`file:`), and hardens surviving links with
+except `href`/`title` on anchors, keeps only allow-listed hrefs (http/https/
+mailto/tel, root-relative `/`, anchors `#`, or empty — every other scheme such
+as `javascript:`, `data:`, `ftp:` is stripped), and hardens surviving links with
 `rel="noopener noreferrer" target="_blank"`. Browser-only (uses `DOMParser`).
 
 ```ts
@@ -721,12 +734,18 @@ import {
   fmtPrice,
   fmtPct,
   fmtUsd,
+  // …plus fmtDateTimeMs, fmtCalendarDate, fmtCalendarDateTime,
+  // fmtMsAsSeconds, fmtBytes, fmtDuration, formatJson, stringifyValue
 } from 'mgv-backoffice'
 ```
 
 Locale-aware, pure, dependency-free formatters for tables, logs and charts.
-They handle missing/non-finite input gracefully (rendering an em-dash) so raw
-API values can be passed without pre-sanitising.
+`fmtNumber`, `fmtDate`, `fmtCalendarDate`, `fmtCalendarDateTime` and
+`fmtDuration` handle missing/non-finite input gracefully (rendering an
+em-dash) so raw API values can be passed without pre-sanitising; the
+epoch/numeric formatters (`fmtDateTime`, `fmtDateShort`, `fmtDateTimeMs`,
+`fmtPrice`, `fmtPct`, `fmtUsd`) expect valid input and will render
+`"Invalid Date"` / `"NaN"` otherwise.
 
 | Function       | Signature                                                       | Returns |
 | -------------- | --------------------------------------------------------------- | ------- |
@@ -758,7 +777,7 @@ disabled" and passes validation.
 
 | Function                 | Signature | Returns |
 | ------------------------ | --------- | ------- |
-| `buildSpecParams`        | `(specs: SpecField[] \| undefined, existing: Record<string, SpecFieldValue>) => Record<string, SpecFieldValue>` | Value map seeded from each spec's `default`, keeping overlapping values the caller already has. |
+| `buildSpecParams`        | `(specs: SpecField[] \| undefined, existing: Record<string, SpecFieldValue>) => Record<string, SpecFieldValue>` | Value map seeded from each spec's `default`, keeping non-null overlapping values the caller already has (an existing `null` is re-seeded from the spec's `default`). |
 | `firstInvalidNumericSpec`| `(specs: SpecField[] \| undefined, params: Record<string, SpecFieldValue>) => string \| null` | Label of the first blank / NaN numeric field, or `null` when all numerics are valid. |
 
 ### Profit & loss
@@ -770,7 +789,7 @@ import type { PnL, PnLInputs } from 'mgv-backoffice'
 
 | Function     | Signature                       | Returns |
 | ------------ | ------------------------------- | ------- |
-| `computePnL` | `(row: PnLInputs) => PnL`       | Unrealised mark-to-market PnL in absolute USD and percent. Returns `{ pnlUsd: null, pnlPct: null }` when any input is missing, non-finite, or `buyPrice <= 0`. |
+| `computePnL` | `(row: PnLInputs) => PnL`       | Unrealised mark-to-market PnL in absolute USD and percent. Returns `{ pnlUsd: null, pnlPct: null }` when any input is missing, non-finite, or `buyPrice <= 0` / `lastPrice <= 0`. |
 
 ```ts
 interface PnLInputs {
@@ -798,7 +817,8 @@ computePnL({ buyPrice: 100, lastPrice: 110, filledQty: 5 })
 
 Root layout: dark/light page background, skip link, `<main>`-with-inert wrapper.
 The `<main>` content offset tracks the sidebar width automatically —
-`lg:ml-60` when expanded, `lg:ml-16` when collapsed (via `useSidebarCollapse()`).
+`lg:ml-60` when expanded, `lg:ml-16` when collapsed (via `useSidebarCollapse()`) —
+and adds `pt-14 lg:pt-0` for the mobile top bar while the sidebar is shown.
 
 **Props:**
 
@@ -849,9 +869,9 @@ nav sections.
 
 | Slot     | Slot props | Description |
 | -------- | ---------- | ----------- |
-| `logo`   | `{ size }` | Brand logo. Receives a `size` hint (28px in mobile bar, 52px in sidebar). |
+| `logo`   | `{ size }` | Brand logo. Receives a `size` hint (28px in mobile bar, 52px in expanded sidebar, 36px in the collapsed rail). |
 | `status` | —          | Footer status row (e.g. health indicator, sync state). |
-| `footer` | —          | Replaces the default `appName v0` line. |
+| `footer` | —          | Replaces the default `appName` + `v{version}` line. |
 
 **Types:**
 
@@ -1014,6 +1034,9 @@ aria-modal. Compose this rather than building modals from scratch.
 | Prop            | Type      | Default     | Description |
 | --------------- | --------- | ----------- | ----------- |
 | `title`         | `String`  | **required** | Modal heading. |
+| `icon`          | `Component` | **required** | Heroicon rendered in a tinted circular chip left of the title (the `icon` slot can override the whole chip). |
+| `iconBgClass`   | `String`  | `''`        | Background classes of the icon chip; empty falls back to the emerald tint (dark-mode aware). |
+| `iconClass`     | `String`  | `'text-emerald-600'` | Classes applied to the icon itself. |
 | `maxWidthClass` | `String`  | `'max-w-md'` | Tailwind max-w utility for the card. |
 | `manualClose`   | `Boolean` | `false`     | If true, backdrop click and Escape do NOT auto-emit `cancel`. |
 | `scrollable`    | `Boolean` | `false`     | Switch to the large-content layout: a flex column capped at `90vh` with a fixed header/footer and a scrolling body. |
@@ -1028,8 +1051,11 @@ Confirmation dialog built on `BaseModalShell`. Variant chooses red (danger) or
 amber (warning) styling.
 
 **Props:** `title`, `message`, `confirmText`, `cancelText`, `submittingText`,
-`variant: 'danger' | 'warning'`, `submitting`.
+`variant: 'danger' | 'warning'`, `submitting`. While `submitting` is true,
+backdrop clicks and Escape stop dismissing the dialog.
 
+**Slots:** `message` — rich markup replacing the plain `message` string;
+`default` — extra content below the message (warning banner, opt-in checkbox).
 **Events:** `confirm`, `cancel`.
 
 ### BaseTextInputModal
@@ -1054,6 +1080,7 @@ Searchable "pick one from a list" dialog. Pass `items` directly or an async
 `searchPlaceholder`, `emptyMessage`, `noMatchMessage`, `confirmText`,
 `cancelText`, `submittingText`, `submitting`.
 
+**Slots:** `icon` — override the default icon chip.
 **Events:** `confirm(itemId: string)`, `cancel`.
 
 ```ts
@@ -1368,7 +1395,7 @@ Themed text/number input carrying the shared field skin (slate border,
 
 | Prop         | Type               | Default  | Description |
 | ------------ | ------------------ | -------- | ----------- |
-| `modelValue` | `String \| Number` | `''`     | `v-model` value. |
+| `modelValue` | `String \| Number \| null` | `''`     | `v-model` value. |
 | `type`       | `String`           | `'text'` | Native input type. |
 | `size`       | `String`           | `'md'`   | `'md'` = `px-3 py-2`, `'sm'` = `px-2 py-1.5`. |
 | `block`      | `Boolean`          | `true`   | Full-width (`w-full`); set `false` for inline fields. |
@@ -1389,7 +1416,7 @@ default slot so callers keep full control of `<option>` rendering.
 
 | Prop         | Type               | Default | Description |
 | ------------ | ------------------ | ------- | ----------- |
-| `modelValue` | `String \| Number` | `''`    | `v-model` value. |
+| `modelValue` | `String \| null`   | `undefined` | `v-model` value. When left undefined the browser keeps its own default selection. |
 | `size`       | `String`           | `'sm'`  | `'sm'` = `px-2 py-1.5`, `'md'` = `px-3 py-2`. |
 | `block`      | `Boolean`          | `true`  | Full-width; set `false` for inline selects. |
 
@@ -1420,10 +1447,12 @@ it.
 | `options`     | `DropdownOption[]`         | **required** | `{ value, label, title?, disabled? }` per row. |
 | `modelValue`  | `String \| Number \| null` | `null`       | Selected option's `value` (`v-model`). |
 | `placeholder` | `String`                   | `'Select'`   | Trigger text shown when nothing is selected. |
-| `size`        | `String`                   | `'md'`       | `'md'` = `px-4 py-2.5` (app filter height), `'sm'` = `px-3 py-2`. |
+| `size`        | `String`                   | `'md'`       | `'md'` = `px-4 py-2.5` (app filter height), `'sm'` = `px-3 py-2`. Ignored when `triggerClass` is set. |
 | `block`       | `Boolean`                  | `true`       | Full-width; set `false` for an inline, content-width dropdown. |
 | `disabled`    | `Boolean`                  | `false`      | Disables the trigger. |
 | `ariaLabel`   | `String`                   | `''`         | Accessible name for the trigger/listbox when there is no visible label. |
+| `triggerClass`| `String`                   | `''`         | Replaces the trigger's default slate skin entirely (including the `size` padding). |
+| `chevronClass`| `String`                   | `'w-5 h-5 text-slate-500 dark:text-slate-400'` | Classes for the chevron icon. |
 
 **Emits:** `update:modelValue(value)`.
 
@@ -1496,7 +1525,7 @@ and the owner writes it back into its own state.
 
 | Prop     | Type                             | Default      | Description |
 | -------- | -------------------------------- | ------------ | ----------- |
-| `specs`  | `SpecField[]`                    | **required** | `{ key, label, type: 'decimal' \| 'integer' \| 'boolean' \| 'select', options?, step?, min?, help? }`. |
+| `specs`  | `SpecField[]`                    | **required** | `{ key, label, type: 'decimal' \| 'integer' \| 'boolean' \| 'select', default?, options?, step?, min?, help? }` (optional members are nullable). |
 | `params` | `Record<string, SpecFieldValue>` | **required** | Current values keyed by `spec.key`. |
 
 **Slots:** `after` (`{ spec }`) — extra content under each field (e.g. a live
@@ -1704,6 +1733,11 @@ import {
   useFieldClasses,
   usePolling,
 } from 'mgv-backoffice'
+import type {
+  UseThemeOptions,
+  UseSidebarCollapseOptions,
+  UsePollingOptions,
+} from 'mgv-backoffice'
 ```
 
 | Composable | Purpose |
@@ -1713,7 +1747,7 @@ import {
 | `useThemeClasses()` | Named Tailwind class roles for dark/light (card, border, primaryText, mutedText, dimText, input, ghostButton, emeraldText, redText, …). Since 1.34.0 returns a `reactive` object of plain strings — bind `t.card` directly, never `t.card.value` (the old ComputedRef shape leaked ref internals into `:class` bindings). |
 | `useEscapeKey(handler)` | Component-scoped Escape key listener. |
 | `useDebouncedRef(source, delay?)` | Debounced mirror of a ref. Timer cleared on scope dispose. |
-| `useToast(durationMs?)` | Per-component toast state: `{ showToast, toastMessage, toastType, showToastMessage }`. |
+| `useToast(durationMs?)` | Per-component toast state: `{ showToast, toastMessage, toastType, showToastMessage }`. `showToastMessage` also accepts a per-call duration override. |
 | `useMobileSidebar()` | Singleton state shared between `BaseSidebar` and `BaseAppLayout` for the off-canvas open/closed flag. |
 | `useSidebarCollapse({ storageKey? })` | Singleton collapsed/expanded state for the desktop sidebar rail, shared between `BaseSidebar` and `BaseAppLayout` and persisted to localStorage (default key `'mgv-sidebar-collapsed'`). |
 | `useNotifications()` | Singleton notification state shared by the sidebar bell and `BaseNotificationPanel`: `{ notifications, unreadCount, open, openPanel, closePanel, togglePanel, setNotifications, add, remove, markRead, markAllRead, clear }`. |
