@@ -739,6 +739,7 @@ API values can be passed without pre-sanitising.
 | `fmtCalendarDateTime` | `(s: string \| number \| null \| undefined) => string`   | `"Mon D, YYYY, HH:MM"` en-US calendar label with time of day. |
 | `fmtMsAsSeconds` | `(ms: number \| null \| undefined) => string`                 | `"= 1.50 s"` magnitude hint for millisecond inputs (3 decimals below 1 s); `''` for non-positive input. |
 | `fmtBytes`     | `(bytes: number \| null \| undefined) => string`                | `"512 B"` / `"1.5 KB"` / `"2.0 MB"`; `''` for zero/falsy input. |
+| `fmtDuration`  | `(ms: number \| null \| undefined, maxUnits = 2) => string`     | Compact day/hour/minute duration, e.g. `"3d 5h"` / `"5h 12m"` / `"12m"`. Zero-value leading units are dropped; `maxUnits` caps how many units render. Em-dash for null/undefined/non-finite. |
 | `fmtPrice`     | `(n: number) => string`                                         | Price with precision that scales to magnitude (more decimals for sub-cent values). |
 | `fmtPct`       | `(n: number, digits = 2) => string`                             | Percentage with explicit sign, e.g. `"+2.50%"`. |
 | `fmtUsd`       | `(v: number) => string`                                         | Signed USD amount with leading sign, e.g. `"+$5.00"`. |
@@ -1507,6 +1508,46 @@ validation can catch it.
 ```vue
 <BaseSpecFields :specs="entry.params" :params="form.params"
   @update="(key, value) => (form.params[key] = value)" />
+```
+
+### BaseStatBreakdown
+
+Compact per-item breakdown meant to sit under a summary/stat card (pairs with
+[`EarningsCard`](#earningscard)). Each item renders on its own line — label
+left, value right in monospace. A `null`/`undefined` value (a source that is
+unconfigured, unreachable, or has no matching rows) shows an em-dash rather
+than a misleading 0. With `signed`, values gain an explicit "+" and are
+coloured green/red by sign (same `"-$3.00"` / `"+$5.00"` shape as `fmtUsd`).
+
+**Props:**
+
+| Prop       | Type                  | Default      | Description |
+| ---------- | --------------------- | ------------ | ----------- |
+| `items`    | `StatBreakdownItem[]` | **required** | `{ label, value }` per row. |
+| `currency` | `String`              | `''`         | Currency symbol placed after the sign, e.g. `'$'`. |
+| `decimals` | `Number`              | `2`          | Fraction digits shown for each value. |
+| `signed`   | `Boolean`             | `false`      | Show an explicit "+" on non-negative values and colour rows green/red by sign. |
+
+```ts
+import type { StatBreakdownItem } from 'mgv-backoffice'
+
+interface StatBreakdownItem {
+  label: string                      // row label rendered on the left
+  value: number | null | undefined   // null/undefined renders as an em-dash
+}
+```
+
+```vue
+<EarningsCard title="TOTAL P&L" :amount="totalPnl" signed />
+<BaseStatBreakdown
+  :items="[
+    { label: 'Alpaca', value: 42.5 },
+    { label: 'Binance', value: -3.1 },
+    { label: 'Kraken', value: null },
+  ]"
+  currency="$"
+  signed
+/>
 ```
 
 ### BaseFilterChip
