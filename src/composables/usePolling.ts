@@ -35,6 +35,10 @@ export function usePolling(
 
   let timer: ReturnType<typeof setInterval> | null = null
   const active = ref(false)
+  // True only when the visibility handler paused an ACTIVE loop. A loop the
+  // caller stopped explicitly (stop(), e.g. an auto-refresh toggle) must stay
+  // stopped across hide/show cycles instead of being silently restarted.
+  let suspendedByVisibility = false
 
   function startTimer() {
     if (timer !== null || intervalMs === null) return
@@ -49,6 +53,7 @@ export function usePolling(
   }
 
   function start() {
+    suspendedByVisibility = false
     if (active.value) return
     active.value = true
     if (immediate) void fn()
@@ -56,19 +61,26 @@ export function usePolling(
   }
 
   function stop() {
+    suspendedByVisibility = false
     active.value = false
     stopTimer()
   }
 
   function onVisibilityChange() {
     if (document.visibilityState === 'visible') {
-      // Refresh right away so stale data doesn't linger for a full
-      // interval after the user returns, then re-arm the timer.
+      // Only resume a loop THIS handler paused — a caller-stopped loop
+      // stays stopped. Refresh right away so stale data doesn't linger
+      // for a full interval after the user returns, then re-arm the timer.
+      if (!suspendedByVisibility) return
+      suspendedByVisibility = false
       active.value = true
       void fn()
       startTimer()
     } else {
-      stop()
+      if (!active.value) return
+      active.value = false
+      stopTimer()
+      suspendedByVisibility = true
     }
   }
 

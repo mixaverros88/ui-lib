@@ -1078,7 +1078,8 @@ Drop-in 404 view.
 
 Page-level header: icon badge + title/subtitle on the left, action
 buttons on the right. Gives top-level views a consistent header shape
-and width.
+and width. The icon badge only renders when the `icon` slot is filled,
+so icon-less apps get a plain title/subtitle header.
 
 **Props:**
 
@@ -1087,14 +1088,17 @@ and width.
 | `title`         | `String` | **required**  | H1 text. |
 | `subtitle`      | `String` | `''`          | Muted line below the title. |
 | `iconColor`     | `String` | `'emerald'`   | Badge + icon colour: `'emerald' \| 'sky' \| 'red' \| 'amber'`. |
-| `maxWidthClass` | `String` | `'max-w-4xl'` | Tailwind max-w utility constraining header width. |
+| `maxWidthClass` | `String` | `'max-w-4xl'` | Tailwind max-w utility constraining header width. Pass `''` to skip the width wrapper entirely — the header then spans its container. |
+| `align`         | `String` | `'center'`    | Vertical alignment of the title block vs the actions: `'center'` or `'end'` (actions sit on the title baseline). |
+| `marginClass`   | `String` | `'mb-8'`      | Space under the header. Pass `''` when the parent manages vertical rhythm (`space-y-*`). |
 
 **Slots:**
 
-| Slot      | Slot props        | Description |
-| --------- | ----------------- | ----------- |
-| `icon`    | `{ iconClass }`   | Page Heroicon. Bind `:class="iconClass"` for the theme-aware colour. |
-| `actions` | —                 | Buttons rendered on the right (refresh, destructive, etc.). |
+| Slot       | Slot props        | Description |
+| ---------- | ----------------- | ----------- |
+| `icon`     | `{ iconClass }`   | Page Heroicon. Bind `:class="iconClass"` for the theme-aware colour. Badge square renders only when this slot is filled. |
+| `subtitle` | —                 | Rich subtitle content (links, `<strong>`, interpolation); overrides the `subtitle` prop. |
+| `actions`  | —                 | Buttons rendered on the right (refresh, destructive, etc.). |
 
 ```vue
 <template>
@@ -1613,6 +1617,35 @@ interface PillPickerItem {
 
 ---
 
+### BaseBarDistribution
+
+Compact value-distribution chart: one thin rounded bar per distinct
+value, count labelled on top and the value underneath — scrolls
+sideways when there are many bars. Pure Tailwind, no chart library.
+Extracted from TradeAutomation's variant-stats modal.
+
+**Props:**
+
+| Prop           | Type     | Default                | Description |
+| -------------- | -------- | ---------------------- | ----------- |
+| `bars`         | `Array`  | **required**           | `DistributionBar[]` — `{ label, count }` per bar, in display order (sort ascending for numeric values). |
+| `ariaLabel`    | `String` | `'Value distribution'` | Accessible description of the chart. |
+| `countNoun`    | `String` | `'item'`               | Noun for each bar's tooltip count, e.g. `'variant'` → "3 variants". |
+| `titlePrefix`  | `String` | `''`                   | Tooltip prefix before the value, e.g. the field name. |
+| `maxBarHeight` | `Number` | `56`                   | Height of the tallest bar, in px. |
+| `barClass`     | `String` | emerald fill           | Tailwind classes for the bar fill. |
+
+```vue
+<BaseBarDistribution
+  :bars="[{ label: '0.5', count: 1 }, { label: '1', count: 4 }]"
+  aria-label="Distribution of Take profit across variants"
+  title-prefix="Take profit"
+  count-noun="variant"
+/>
+```
+
+---
+
 ## Composables
 
 ```ts
@@ -1645,7 +1678,7 @@ import {
 | `useNotifications()` | Singleton notification state shared by the sidebar bell and `BaseNotificationPanel`: `{ notifications, unreadCount, open, openPanel, closePanel, togglePanel, setNotifications, add, remove, markRead, markAllRead, clear }`. |
 | `useQueryParamSync()` | URL-query mirroring for filterable views: `{ qparam(name), qenum(name, allowed, fallback), replaceQuery(next) }`. Read filters from the query string once on setup, write changes back with `router.replace` (no-op when unchanged) so filtered views stay shareable without polluting history. |
 | `useFieldClasses()` | Shared form-field class strings for the gray/emerald form skin: `{ label, input, requiredInput(value) }`. `requiredInput` returns a red border+ring skin while the value is empty and the standard skin otherwise. |
-| `usePolling(fn, intervalMs, { immediate?, pauseWhenHidden? })` | Visibility-gated polling loop bound to the component lifecycle: starts on mount, stops on unmount, pauses while the tab is hidden and refreshes + resumes on return to visible (both default on). Pass `intervalMs: null` for refresh-only mode (run on mount + each return-to-visible, no timer). Returns `{ start, stop, active }`. Catch errors inside `fn` — the loop never swallows rejections. |
+| `usePolling(fn, intervalMs, { immediate?, pauseWhenHidden? })` | Visibility-gated polling loop bound to the component lifecycle: starts on mount, stops on unmount, pauses while the tab is hidden and refreshes + resumes on return to visible (both default on). Pass `intervalMs: null` for refresh-only mode (run on mount + each return-to-visible, no timer). Returns `{ start, stop, active }`. A loop stopped via `stop()` stays stopped across hide/show cycles (since 1.36.0) — only a visibility-paused loop auto-resumes. Catch errors inside `fn` — the loop never swallows rejections. |
 
 ---
 

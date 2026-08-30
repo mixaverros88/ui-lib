@@ -50,6 +50,7 @@ export { default as BaseStatBreakdown } from './components/BaseStatBreakdown.vue
 export { default as BaseFilterChip } from './components/BaseFilterChip.vue'
 export { default as BaseCredentialsForm } from './components/BaseCredentialsForm.vue'
 export { default as BasePillPickerModal } from './components/BasePillPickerModal.vue'
+export { default as BaseBarDistribution } from './components/BaseBarDistribution.vue'
 export type { CredentialsView, CredentialsUpdate } from './components/BaseCredentialsForm.vue'
 
 // Composables
@@ -94,6 +95,7 @@ export type { TableColumn } from './types/table'
 export type { SpecField, SpecFieldType, SpecFieldValue } from './types/specField'
 export type { StatBreakdownItem } from './types/statBreakdown'
 export type { PillPickerItem } from './types/pillPicker'
+export type { DistributionBar } from './types/distribution'
 
 // Utils
 export { getBaseColor, getBaseColorOf } from './utils/util'

@@ -6,7 +6,11 @@
     Slots:
       • icon    — the page-specific Heroicon. Receives an `iconClass`
         slot prop carrying the theme-aware text colour, so callers can
-        bind `:class="iconClass"` on their icon component.
+        bind `:class="iconClass"` on their icon component. The badge
+        square only renders when this slot is filled, so icon-less apps
+        get a plain title/subtitle header.
+      • subtitle — rich subtitle content (links, emphasis); overrides
+        the `subtitle` prop.
       • actions — refresh / destructive buttons rendered on the right.
 
     Props:
@@ -16,18 +20,27 @@
         ('emerald' | 'sky' | 'red' | 'amber'). Defaults to 'emerald'.
       • maxWidthClass — Tailwind max-w utility constraining the header
         width so sibling views can share a footprint. Defaults to
-        'max-w-4xl'.
+        'max-w-4xl'; pass '' to skip the width wrapper entirely (the
+        header then spans whatever container it sits in).
+      • align — vertical alignment of the title block vs the actions:
+        'center' (default) or 'end' (actions sit on the title baseline).
+      • marginClass — space under the header. Defaults to 'mb-8'; pass
+        '' when the parent already manages vertical rhythm (space-y-*).
   -->
-  <div :class="['mx-auto px-4 sm:px-6', maxWidthClass]">
+  <header :class="maxWidthClass ? ['mx-auto px-4 sm:px-6', maxWidthClass] : undefined">
     <!--
       flex-wrap + gap so a long title and the action buttons reflow onto
       separate rows on narrow (mobile) viewports instead of the actions
       overflowing off the right edge of the screen. min-w-0 on the title
       group lets a long title truncate rather than shoving the actions out.
     -->
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+    <div
+      class="flex flex-wrap justify-between gap-3"
+      :class="[align === 'end' ? 'items-end' : 'items-center', marginClass]"
+    >
       <div class="flex items-center gap-3 min-w-0">
         <div
+          v-if="$slots.icon"
           class="w-10 h-10 rounded-lg flex items-center justify-center"
           :class="badgeBgClass"
         >
@@ -37,8 +50,8 @@
           <h1 class="text-2xl font-bold" :class="t.primaryTextSoft">
             {{ title }}
           </h1>
-          <p v-if="subtitle" class="text-sm" :class="t.dimTextAlt">
-            {{ subtitle }}
+          <p v-if="subtitle || $slots.subtitle" class="text-sm" :class="t.dimTextAlt">
+            <slot name="subtitle">{{ subtitle }}</slot>
           </p>
         </div>
       </div>
@@ -46,7 +59,7 @@
         <slot name="actions" />
       </div>
     </div>
-  </div>
+  </header>
 </template>
 
 <script setup lang="ts">
@@ -62,11 +75,15 @@ const props = withDefaults(
     subtitle?: string
     iconColor?: IconColor
     maxWidthClass?: string
+    align?: 'center' | 'end'
+    marginClass?: string
   }>(),
   {
     subtitle: '',
     iconColor: 'emerald',
     maxWidthClass: 'max-w-4xl',
+    align: 'center',
+    marginClass: 'mb-8',
   },
 )
 
