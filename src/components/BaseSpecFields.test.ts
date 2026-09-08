@@ -55,6 +55,45 @@ describe('BaseSpecFields', () => {
     ])
   })
 
+  it('truncates fractional input on integer fields (e.g. a pasted decimal)', async () => {
+    const wrapper = mountFields()
+    const lookback = wrapper.findAll('input[type="number"]')[1]
+    await lookback.setValue('2.5')
+    expect(wrapper.emitted('update')).toEqual([['lookback', 2]])
+  })
+
+  it('blocks decimal-separator and exponent keys on integer fields only', () => {
+    const wrapper = mountFields()
+    const [threshold, lookback] = wrapper.findAll('input[type="number"]')
+    const press = (input: typeof lookback, key: string) => {
+      const ev = new KeyboardEvent('keydown', { key, cancelable: true })
+      input.element.dispatchEvent(ev)
+      return ev.defaultPrevented
+    }
+    for (const key of ['.', ',', 'e', 'E']) {
+      expect(press(lookback, key)).toBe(true)
+      expect(press(threshold, key)).toBe(false)
+    }
+    expect(press(lookback, '5')).toBe(false)
+  })
+
+  it('refuses pastes with non-integer content on integer fields', () => {
+    const wrapper = mountFields()
+    const lookback = wrapper.findAll('input[type="number"]')[1]
+    const paste = (text: string) => {
+      // jsdom has no ClipboardEvent constructor — a plain cancelable Event
+      // with a stubbed clipboardData exercises the same handler path.
+      const ev = new Event('paste', { cancelable: true })
+      Object.defineProperty(ev, 'clipboardData', { value: { getData: () => text } })
+      lookback.element.dispatchEvent(ev)
+      return ev.defaultPrevented
+    }
+    expect(paste('0.5')).toBe(true)
+    expect(paste('2e3')).toBe(true)
+    expect(paste('12')).toBe(false)
+    expect(paste('-3')).toBe(false)
+  })
+
   it('never mutates params directly', async () => {
     const frozen = Object.freeze({ ...params })
     const wrapper = mount(BaseSpecFields, { props: { specs, params: frozen } })

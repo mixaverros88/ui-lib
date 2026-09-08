@@ -32,9 +32,30 @@ function onCheckbox(key: string, e: Event) {
 // Mirror v-model.number: a parseable value becomes a number, anything else
 // (including a cleared field, which becomes '') passes through as the raw
 // string so the owner's "enter a valid number" validation can catch it.
-function onNumber(key: string, raw: string) {
+// Integer specs truncate any fractional value (a pasted "2.5" becomes 2 —
+// typed decimals never get this far, see onIntegerKeydown).
+function onNumber(spec: SpecField, raw: string) {
   const n = parseFloat(raw)
-  emit('update', key, Number.isNaN(n) ? raw : n)
+  if (Number.isNaN(n)) {
+    emit('update', spec.key, raw)
+    return
+  }
+  emit('update', spec.key, spec.type === 'integer' ? Math.trunc(n) : n)
+}
+
+// type="number" step=1 only flags decimals as :invalid — it doesn't stop them
+// being typed — so integer fields swallow the decimal separators (and the
+// exponent key) at the keyboard, and refuse pastes carrying anything beyond
+// an optional sign and digits.
+function onIntegerKeydown(e: KeyboardEvent) {
+  if (e.key === '.' || e.key === ',' || e.key === 'e' || e.key === 'E') {
+    e.preventDefault()
+  }
+}
+
+function onIntegerPaste(e: ClipboardEvent) {
+  const text = e.clipboardData?.getData('text') ?? ''
+  if (!/^-?\d*$/.test(text.trim())) e.preventDefault()
 }
 </script>
 
@@ -72,7 +93,10 @@ function onNumber(key: string, raw: string) {
         type="number"
         :step="spec.step ?? (spec.type === 'integer' ? 1 : 0.01)"
         :min="spec.min ?? undefined"
-        @update:modelValue="(v: string) => onNumber(spec.key, v)"
+        :inputmode="spec.type === 'integer' ? 'numeric' : undefined"
+        @keydown="spec.type === 'integer' && onIntegerKeydown($event)"
+        @paste="spec.type === 'integer' && onIntegerPaste($event)"
+        @update:modelValue="(v: string) => onNumber(spec, v)"
       />
 
       <p v-if="spec.help" class="text-[11px] text-slate-400 mt-1">{{ spec.help }}</p>

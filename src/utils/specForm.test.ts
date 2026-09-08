@@ -31,6 +31,17 @@ describe('firstInvalidNumericSpec', () => {
       .toBeNull()
   })
 
+  it('flags a fractional value on an integer field', () => {
+    const withInt: SpecField[] = [
+      ...specs,
+      { key: 'quantityPerSymbol', label: 'Quantity per symbol (shares)', type: 'integer', default: 0, min: 0, step: 1, options: null, help: '' },
+    ]
+    const base = { amountPerSymbol: 10, stopLossPercent: 1 }
+    expect(firstInvalidNumericSpec(withInt, { ...base, quantityPerSymbol: 0.1 }))
+      .toBe('Quantity per symbol (shares)')
+    expect(firstInvalidNumericSpec(withInt, { ...base, quantityPerSymbol: 2 })).toBeNull()
+  })
+
   it('accepts a fully valid value set and tolerates missing specs', () => {
     expect(firstInvalidNumericSpec(specs, { amountPerSymbol: 10, stopLossPercent: 1 })).toBeNull()
     expect(firstInvalidNumericSpec(undefined, {})).toBeNull()

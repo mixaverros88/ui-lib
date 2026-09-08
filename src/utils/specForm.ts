@@ -29,7 +29,7 @@ export function buildSpecParams(
  * '' under number coercion), or null when every numeric field holds a number.
  * A spec whose `default` is null is OPTIONAL: blank means "knob disabled" and
  * must pass; a non-blank value on an optional field is still validated as a
- * number.
+ * number. Integer specs additionally reject fractional values.
  */
 export function firstInvalidNumericSpec(
   specs: readonly SpecField[] | undefined,
@@ -42,6 +42,7 @@ export function firstInvalidNumericSpec(
       const blank = v === '' || v === null || v === undefined
       if (spec.default === null && blank) continue
       if (typeof v !== 'number' || Number.isNaN(v)) return spec.label
+      if (spec.type === 'integer' && !Number.isInteger(v)) return spec.label
     }
   }
   return null
