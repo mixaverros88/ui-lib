@@ -304,7 +304,7 @@ function navigate(name: string) {
                 class="flex items-center justify-center gap-2 text-xs"
                 :class="isDark ? 'text-gray-500' : 'text-gray-500'"
               >
-                <span>{{ appName }}<template v-if="appName && version"> </template><template v-if="version">v{{ version }}</template></span>
+                <span>{{ appName }}<template v-if="appName && version">{{ ' ' }}</template><template v-if="version">v{{ version }}</template></span>
               </div>
             </slot>
           </div>
