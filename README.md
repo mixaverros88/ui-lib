@@ -1465,6 +1465,38 @@ it.
 />
 ```
 
+### BaseDateTimePicker
+
+Date / date-time / time picker built on
+[@vuepic/vue-datepicker](https://vue3datepicker.com). The package is a regular
+dependency of this lib (installed automatically) and its CSS ships inside
+`ui-lib.css`, so consumers install and import nothing extra. Dark mode follows
+`useTheme()`; the skin matches BaseInput (slate surfaces, emerald accent).
+
+**Props:**
+
+| Prop         | Type               | Default      | Description |
+| ------------ | ------------------ | ------------ | ----------- |
+| `modelValue` | `ModelValue`       | `null`       | `v-model` value — `Date`, `Date[]` for ranges, a time object in `'time'` mode, or a string/number with `model-type`. |
+| `mode`       | `'date' \| 'datetime' \| 'time'` | `'datetime'` | Calendar only, calendar + time, or time only. |
+| `format`     | `String`           | per mode     | date-fns input pattern. Defaults: `dd/MM/yyyy`, `dd/MM/yyyy HH:mm`, `HH:mm` (`hh:mm a` when `is24` is false). |
+| `is24`       | `Boolean`          | `true`       | 24-hour clock. |
+| `autoApply`  | `Boolean`          | `false`      | Select on click, without the Cancel/Select row. |
+| `teleport`   | `Boolean \| String \| HTMLElement` | `true` | Menu mount target; `true` = body, so modals don't clip it. |
+| `timeConfig` | `Partial<TimeConfig>` | —         | Extra time options (seconds, increments…), merged over the defaults. |
+
+Every other VueDatePicker prop (`range`, `min-date`, `max-date`,
+`disabled-dates`, `placeholder`, `model-type`, …), event and slot is passed
+straight through.
+
+**Emits:** `update:modelValue(value)`.
+
+```vue
+<BaseDateTimePicker v-model="startsAt" placeholder="Start" />
+<BaseDateTimePicker v-model="day" mode="date" :min-date="new Date()" auto-apply />
+<BaseDateTimePicker v-model="period" mode="date" range />
+```
+
 ### BaseSegmentedControl
 
 Segmented button group ("All | Stock | Crypto"). One button per option; the

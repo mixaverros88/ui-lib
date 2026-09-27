@@ -53,6 +53,10 @@ export { default as BasePillPickerModal } from './components/BasePillPickerModal
 export { default as BaseBarDistribution } from './components/BaseBarDistribution.vue'
 export type { CredentialsView, CredentialsUpdate } from './components/BaseCredentialsForm.vue'
 
+// Components — third-party wrappers
+export { default as BaseDateTimePicker } from './components/BaseDateTimePicker.vue'
+export type { DateTimePickerMode } from './components/BaseDateTimePicker.vue'
+
 // Composables
 export { useTheme, initTheme } from './composables/useTheme'
 export type { UseThemeOptions } from './composables/useTheme'

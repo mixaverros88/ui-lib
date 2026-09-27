@@ -1,6 +1,6 @@
 {
   "name": "mgv-backoffice",
-  "version": "1.36.3",
+  "version": "1.37.0",
   "description": "Shared Vue 3 UI component library",
   "type": "module",
   "main": "./dist/ui-lib.umd.cjs",
@@ -51,5 +51,8 @@
     "vitest": "^5.0.2",
     "vue": "^3.5.43",
     "vue-router": "^5.3.1"
+  },
+  "dependencies": {
+    "@vuepic/vue-datepicker": "^14.0.0"
   }
 }

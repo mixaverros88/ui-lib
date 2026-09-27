@@ -26,13 +26,17 @@ export default defineConfig({
       fileName: 'ui-lib',
     },
     rolldownOptions: {
-      external: ['vue', 'vue-router', '@heroicons/vue/24/outline', '@heroicons/vue/24/solid'],
+      // @vuepic/vue-datepicker is a regular dependency (auto-installed for
+      // consumers) — keep its JS external so apps don't bundle two copies. Its
+      // CSS subpath isn't matched here, so it's folded into ui-lib.css.
+      external: ['vue', 'vue-router', '@heroicons/vue/24/outline', '@heroicons/vue/24/solid', '@vuepic/vue-datepicker'],
       output: {
         globals: {
           vue: 'Vue',
           'vue-router': 'VueRouter',
           '@heroicons/vue/24/outline': 'HeroiconsOutline',
           '@heroicons/vue/24/solid': 'HeroiconsSolid',
+          '@vuepic/vue-datepicker': 'VueDatePicker',
         },
       },
     },
