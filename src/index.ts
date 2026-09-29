@@ -56,6 +56,17 @@ export type { CredentialsView, CredentialsUpdate } from './components/BaseCreden
 // Components — third-party wrappers
 export { default as BaseDateTimePicker } from './components/BaseDateTimePicker.vue'
 export type { DateTimePickerMode } from './components/BaseDateTimePicker.vue'
+export { default as BaseSearchSelect } from './components/BaseSearchSelect.vue'
+export { default as BaseCard } from './components/BaseCard.vue'
+export { default as BaseField } from './components/BaseField.vue'
+export { default as BaseStatCard } from './components/BaseStatCard.vue'
+export { default as BaseToggle } from './components/BaseToggle.vue'
+export { default as BaseCheckbox } from './components/BaseCheckbox.vue'
+export { default as BaseSidebarUser } from './components/BaseSidebarUser.vue'
+export { default as BaseAuthLayout } from './components/BaseAuthLayout.vue'
+export { default as BaseBooleanBadge } from './components/BaseBooleanBadge.vue'
+export { default as BaseDetailList } from './components/BaseDetailList.vue'
+export type { DetailItem } from './types/detail'
 
 // Composables
 export { useTheme, initTheme } from './composables/useTheme'

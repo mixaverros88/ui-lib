@@ -7,7 +7,7 @@ describe('BaseInput', () => {
     const wrapper = mount(BaseInput)
     const input = wrapper.find('input')
     expect(input.classes()).toEqual(
-      expect.arrayContaining(['rounded', 'border', 'w-full', 'px-3', 'py-2', 'text-sm']),
+      expect.arrayContaining(['rounded-lg', 'border', 'w-full', 'px-3', 'py-2', 'text-sm']),
     )
     expect(input.attributes('type')).toBe('text')
   })

@@ -47,10 +47,18 @@
           <slot name="icon" :icon-class="iconTextClass" />
         </div>
         <div>
-          <h1 class="text-2xl font-bold" :class="t.primaryTextSoft">
+          <h1
+            class="text-2xl font-bold"
+            :class="[t.primaryTextSoft, accent ? 'relative pl-3.5 tracking-tight' : '']"
+          >
+            <span
+              v-if="accent"
+              class="absolute left-0 top-[0.14em] h-[1.1em] w-1 rounded-full bg-gradient-to-b from-emerald-400 to-emerald-600"
+              aria-hidden="true"
+            />
             {{ title }}
           </h1>
-          <p v-if="subtitle || $slots.subtitle" class="text-sm" :class="t.dimTextAlt">
+          <p v-if="subtitle || $slots.subtitle" class="max-w-[72ch] text-sm" :class="t.dimTextAlt">
             <slot name="subtitle">{{ subtitle }}</slot>
           </p>
         </div>
@@ -77,6 +85,8 @@ const props = withDefaults(
     maxWidthClass?: string
     align?: 'center' | 'end'
     marginClass?: string
+    /** Brand-green gauge bar in front of the title (icon-less headers). */
+    accent?: boolean
   }>(),
   {
     subtitle: '',
@@ -84,6 +94,7 @@ const props = withDefaults(
     maxWidthClass: 'max-w-4xl',
     align: 'center',
     marginClass: 'mb-8',
+    accent: false,
   },
 )
 

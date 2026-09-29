@@ -73,7 +73,12 @@ function changePage(pageNumber: number) {
 }
 
 watch(() => [props.totalItems, props.itemsPerPage], () => {
-  totalPages.value = Math.ceil(props.totalItems / props.itemsPerPage);
+  // Guard against a missing/zero page size or total (e.g. a reset form that
+  // nulled them): fall back to 20 per page / 0 items instead of rendering
+  // "Infinity" or "NaN" pages.
+  const perPage = Number(props.itemsPerPage) > 0 ? Number(props.itemsPerPage) : 20;
+  const total = Number(props.totalItems) > 0 ? Number(props.totalItems) : 0;
+  totalPages.value = Math.ceil(total / perPage);
   if (currentPage.value > totalPages.value) {
     currentPage.value = Math.max(1, totalPages.value);
   }

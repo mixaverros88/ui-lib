@@ -82,4 +82,12 @@ describe('Pagination', () => {
     expect(cellLabels(wrapper)).toEqual(['1', '2'])
     expect(wrapper.find('button.active').text()).toBe('2')
   })
+
+  it('falls back to 20 per page when itemsPerPage is null or 0 (no "Infinity")', () => {
+    for (const itemsPerPage of [null, 0]) {
+      const wrapper = mount(Pagination, { props: { totalItems: 16, itemsPerPage: itemsPerPage as unknown as number } })
+      expect(wrapper.text()).not.toContain('Infinity')
+      expect(wrapper.findAll('button').map((b) => b.text()).filter((t) => /^\d+$/.test(t))).toEqual(['1'])
+    }
+  })
 })

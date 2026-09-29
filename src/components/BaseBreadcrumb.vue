@@ -1,6 +1,6 @@
 <template>
-  <nav class="flex px-5 py-3 text-gray-700 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700" aria-label="Breadcrumb">
-    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+  <nav class="flex overflow-x-auto px-5 py-3 text-gray-700 border border-slate-200 rounded-xl bg-white shadow-sm dark:bg-slate-900 dark:border-slate-700" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center whitespace-nowrap space-x-1 md:space-x-3">
 
       <li class="inline-flex items-center" style="margin-left: 0;">
         <router-link to="/" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">

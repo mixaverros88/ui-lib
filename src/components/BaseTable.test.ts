@@ -52,4 +52,18 @@ describe('BaseTable', () => {
     })
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
   })
+
+  it('has no card chrome by default and adds it with `card`', () => {
+    const plain = mount(BaseTable, { props: { columns } })
+    expect(plain.classes()).not.toContain('border')
+    const card = mount(BaseTable, { props: { columns, card: true } })
+    expect(card.classes()).toEqual(
+      expect.arrayContaining(['overflow-x-auto', 'rounded-xl', 'border']),
+    )
+  })
+
+  it('draws row dividers on the body', () => {
+    const wrapper = mount(BaseTable, { props: { columns } })
+    expect(wrapper.find('tbody').classes()).toEqual(expect.arrayContaining(['divide-y']))
+  })
 })

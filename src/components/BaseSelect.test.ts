@@ -11,15 +11,15 @@ describe('BaseSelect', () => {
     const wrapper = mount(BaseSelect, { slots })
     const select = wrapper.find('select')
     expect(select.classes()).toEqual(
-      expect.arrayContaining(['rounded', 'border', 'w-full', 'px-2', 'py-1.5', 'text-sm']),
+      expect.arrayContaining(['rounded-lg', 'border', 'w-full', 'pl-2.5', 'py-1.5', 'text-sm', 'appearance-none', 'bg-none']),
     )
   })
 
   it('supports md size and inline (non-block) layout', () => {
     const wrapper = mount(BaseSelect, { props: { size: 'md', block: false }, slots })
     const select = wrapper.find('select')
-    expect(select.classes()).toEqual(expect.arrayContaining(['px-3', 'py-2']))
-    expect(select.classes()).not.toContain('w-full')
+    expect(select.classes()).toEqual(expect.arrayContaining(['pl-3', 'py-2']))
+    expect(wrapper.classes()).toContain('inline-block')
   })
 
   it('reflects modelValue and emits the selected value on change', async () => {

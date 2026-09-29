@@ -40,13 +40,13 @@ html .dp--theme-light,
 html .dp--theme-dark {
   --dp-font-family: var(--font-sans);
   --dp-font-size: 0.875rem;
-  --dp-border-radius: 0.25rem;
+  --dp-border-radius: 0.5rem;        /* rounded-lg, like BaseInput */
   --dp-cell-border-radius: 0.25rem;
   --dp-input-padding: 8px 30px 8px 12px;
   --dp-primary-text-color: #fff;
 }
 html .dp--theme-light {
-  --dp-background-color: #f8fafc;   /* slate-50  */
+  --dp-background-color: #fff;      /* white, like BaseInput */
   --dp-text-color: #0f172a;         /* slate-900 */
   --dp-hover-color: #f1f5f9;        /* slate-100 */
   --dp-hover-text-color: #0f172a;

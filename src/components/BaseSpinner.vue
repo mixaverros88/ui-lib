@@ -1,20 +1,6 @@
 <template>
-  <!--
-    Animated loading spinner — a spinning ring with a neutral track and a
-    coloured leading arc.
-
-    Props:
-      • size  — diameter + ring thickness. 'sm' (16px) is the default and
-        reproduces the original spinner; 'md' (24px), 'lg' (32px) and
-        'xl' (48px) step up for full-page / empty-state loaders.
-      • color — the colour of the spinning arc (`border-t-*`). The track
-        stays neutral gray. Defaults to 'blue' to match the original.
-
-    With no props it renders exactly the legacy spinner, so existing
-    `<BaseSpinner />` call sites are unaffected.
-  -->
   <div
-    class="border-gray-200 rounded-full animate-spin"
+    class="border-gray-200 dark:border-slate-700 rounded-full animate-spin"
     :class="[sizeClass, colorClass]"
     role="status"
     aria-label="Loading"
@@ -22,6 +8,20 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Animated loading spinner — a spinning ring with a neutral track and a
+ * coloured leading arc.
+ *
+ * Props:
+ * • size  — diameter + ring thickness. 'sm' (16px) is the default and
+ * reproduces the original spinner; 'md' (24px), 'lg' (32px) and
+ * 'xl' (48px) step up for full-page / empty-state loaders.
+ * • color — the colour of the spinning arc (`border-t-*`). The track
+ * stays neutral gray. Defaults to 'emerald' (the brand green).
+ *
+ * With no props it renders the small (16px) emerald spinner.
+ *
+ */
 import { computed } from 'vue'
 
 type SpinnerSize = 'sm' | 'md' | 'lg' | 'xl'
@@ -42,7 +42,7 @@ const props = withDefaults(
   }>(),
   {
     size: 'sm',
-    color: 'blue',
+    color: 'emerald',
   },
 )
 

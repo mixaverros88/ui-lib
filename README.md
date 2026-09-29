@@ -169,7 +169,7 @@ Button with color, size, loading state, and Vue Router integration.
 | Prop          | Type                                | Default               | Description                          |
 | ------------- | ----------------------------------- | --------------------- | ------------------------------------ |
 | `description` | `String`                            | **required**          | Button label text                    |
-| `color`       | `String`                            | `BaseButtonEnum.BLUE` | Color variant (`BLUE`/`WHITE`/`DARK`/`GREEN`/`EMERALD`/`RED`/`YELLOW`/`PURPLE`/`SKY`/`GRAY`/`AMBER`) |
+| `color`       | `String`                            | `BaseButtonEnum.GREEN` | Color variant (`BLUE`/`WHITE`/`DARK`/`GREEN`/`EMERALD`/`RED`/`YELLOW`/`PURPLE`/`SKY`/`GRAY`/`AMBER`) |
 | `outline`     | `Boolean`                           | `false`               | Outlined/secondary style — transparent fill, coloured text + border, tinted hover (theme-aware) |
 | `ghost`       | `Boolean`                           | `false`               | Ghost/borderless style — no border or fill, coloured text + tinted hover (theme-aware). For compact toolbar/action buttons |
 | `to`          | `String`                            | —                     | Vue Router path (renders `<router-link>`) |
@@ -348,9 +348,9 @@ Animated loading spinner — a neutral ring with a coloured leading arc.
 | Prop    | Type                                                                       | Default  | Description                                                  |
 |---------|----------------------------------------------------------------------------|----------|-------------------------------------------------------------|
 | `size`  | `'sm' \| 'md' \| 'lg' \| 'xl'`                                              | `'sm'`   | Diameter + ring thickness — 16 / 24 / 32 / 48px.            |
-| `color` | `'blue' \| 'emerald' \| 'sky' \| 'indigo' \| 'teal' \| 'purple' \| 'red' \| 'amber'` | `'blue'` | Colour of the spinning arc. The track stays neutral gray.   |
+| `color` | `'blue' \| 'emerald' \| 'sky' \| 'indigo' \| 'teal' \| 'purple' \| 'red' \| 'amber'` | `'emerald'` | Colour of the spinning arc. The track stays neutral gray.   |
 
-With no props it renders the original 16px blue spinner, so existing call sites are unaffected.
+With no props it renders a 16px emerald spinner. For page loaders use `size="xl"` centered, e.g. `<div class="flex justify-center py-12"><BaseSpinner size="xl" /></div>`.
 
 **Example:**
 
@@ -901,6 +901,24 @@ interface NavSection {
 
 ---
 
+### BaseSidebarUser
+
+Signed-in user block for the `BaseSidebar` `footer` slot: initials avatar,
+name and email (a link to the profile page when `to` is set) and a Logout
+button that emits `logout`.
+
+**Props:** `name` (required), `email`, `to` (profile route), `showLogout` (`true`),
+`logoutLabel` (`'Logout'`), `profileLabel` (`'View profile'`, tooltip).
+**Emits:** `logout`.
+
+```vue
+<BaseSidebar :sections="nav">
+  <template #footer>
+    <BaseSidebarUser :name="me.username" :email="me.email" :to="{ name: 'Profile' }" @logout="logOut" />
+  </template>
+</BaseSidebar>
+```
+
 ### BaseNotificationPanel
 
 Left-anchored notification drawer (teleported to `<body>`, slides in from
@@ -1119,6 +1137,7 @@ so icon-less apps get a plain title/subtitle header.
 | `maxWidthClass` | `String` | `'max-w-4xl'` | Tailwind max-w utility constraining header width. Pass `''` to skip the width wrapper entirely — the header then spans its container. |
 | `align`         | `String` | `'center'`    | Vertical alignment of the title block vs the actions: `'center'` or `'end'` (actions sit on the title baseline). |
 | `marginClass`   | `String` | `'mb-8'`      | Space under the header. Pass `''` when the parent manages vertical rhythm (`space-y-*`). |
+| `accent`        | `Boolean` | `false`       | Brand-green gauge bar in front of the title (icon-less headers). |
 
 **Slots:**
 
@@ -1522,9 +1541,10 @@ selected one gets the filled treatment and `aria-pressed="true"`.
 ### BaseTable
 
 Styling shell for data tables — **not** a data grid. Owns the table skin
-(slate header band, `px-4 py-3` header cells, empty-state row); body rows are
-the caller's own `<tr>` markup via the default slot. Wrap it yourself for
-scrolling/card chrome (e.g. a `BaseRow` with `overflow-x-auto`).
+(slate header band, `px-4 py-3` header cells, row dividers + hover, empty-state
+row); body rows are the caller's own `<tr>` markup via the default slot. Pass
+`card` for the rounded, bordered, horizontally scrolling card chrome, or wrap
+it yourself (e.g. a `BaseRow` with `overflow-x-auto`).
 
 **Props:**
 
@@ -1533,6 +1553,7 @@ scrolling/card chrome (e.g. a `BaseRow` with `overflow-x-auto`).
 | `columns`   | `TableColumn[]` | **required** | `{ label, align? }`; `align: 'right'` right-aligns the header cell. |
 | `empty`     | `Boolean`       | `false`      | True renders the empty-state row spanning every column. |
 | `emptyText` | `String`        | `'No rows.'` | Fallback empty-state text. |
+| `card`      | `Boolean`       | `false`      | Wrap in the rounded, bordered, scrolling card. |
 
 **Slots:** `default` — the `<tr>` rows; `empty` — custom empty-state content.
 
@@ -1747,6 +1768,158 @@ Extracted from TradeAutomation's variant-stats modal.
 ```
 
 ---
+
+### BaseSearchSelect
+
+Searchable select (combobox): type to filter, pick with the mouse or
+ArrowUp/ArrowDown + Enter. `multiple` turns it into a tag picker with removable
+chips (Backspace on an empty search removes the last one). Same field skin as
+`BaseInput` / `BaseSelect`; Escape and an outside click close the menu.
+
+**Props:**
+
+| Prop            | Type                          | Default         | Description |
+| --------------- | ----------------------------- | --------------- | ----------- |
+| `options`       | `DropdownOption[]`            | **required**    | `{ value, label, title?, disabled? }` per row. |
+| `modelValue`    | `value \| null \| value[]`    | `null`          | Selected value, or values with `multiple`. |
+| `multiple`      | `Boolean`                     | `false`         | Pick several (chips). |
+| `placeholder`   | `String`                      | `'Select'`      | Shown when nothing is selected. |
+| `searchable`    | `Boolean`                     | `true`          | Typing filters the options. |
+| `clearable`     | `Boolean`                     | `true`          | Show the × clear button while something is selected. |
+| `block`         | `Boolean`                     | `true`          | Full-width. |
+| `disabled`      | `Boolean`                     | `false`         | |
+| `ariaLabel`     | `String`                      | `''`            | Accessible name without a visible label. |
+| `noResultsText` | `String`                      | `'No matches.'` | |
+| `emptyText`     | `String`                      | `'No options.'` | |
+
+**Emits:** `update:modelValue` — the value (single; `null` when cleared) or the
+array of values (`multiple`).
+
+```vue
+<BaseSearchSelect v-model="userId" :options="users.map(u => ({ value: u.id, label: u.name }))" placeholder="Select User" />
+<BaseSearchSelect v-model="tags" :options="TAGS" multiple />
+```
+
+### BaseCard
+
+Bordered surface card — the shared chrome for forms, filter/search panels and
+grouped content.
+
+**Props:** `title`, `subtitle`, `padding: 'md' | 'sm' | 'none'` (`'md'`).
+**Slots:** `default` (body), `actions` (header, right), `footer` (bottom, right-aligned — submit/cancel).
+
+```vue
+<BaseCard title="Template">
+  <form>…</form>
+  <template #footer><BaseButton type="submit" description="Save" /></template>
+</BaseCard>
+```
+
+### BaseField
+
+Label + control + message wrapper for forms and filter bars.
+
+**Props:** `label`, `labelFor` (the control's id), `required`, `error`
+(red, replaces the hint), `hint`, `compact` (small uppercase filter-bar label),
+`grow` (takes the free space in a flex row).
+
+```vue
+<BaseCard padding="sm">
+  <div class="flex flex-wrap items-end gap-4">
+    <BaseField label="Search symbol" label-for="q" compact grow>
+      <BaseInput id="q" v-model="query" />
+    </BaseField>
+    <BaseField label="Class" compact>
+      <BaseSegmentedControl v-model="cls" :options="CLASSES" />
+    </BaseField>
+  </div>
+</BaseCard>
+```
+
+### BaseStatCard
+
+Dashboard stat tile in the `EarningsCard` style (dashed accent border, bold
+title, big value) for any value — counts, labels, pre-formatted numbers.
+
+**Props:** `title` (required), `value`, `subtitle`,
+`accent: 'emerald' | 'sky' | 'amber' | 'red' | 'slate'` (`'emerald'`),
+`to` (router location — makes the whole card a link).
+**Slots:** `icon` (fills the tinted chip; receives `iconClass`), `default` (extra content).
+
+```vue
+<BaseStatCard title="Categories" :value="71" accent="sky" :to="{ name: 'Category List' }">
+  <template #icon="{ iconClass }"><SwatchIcon :class="iconClass" /></template>
+</BaseStatCard>
+```
+
+### BaseCheckbox
+
+Rounded checkbox, emerald when checked (works with or without a forms plugin).
+`v-model` is the boolean; `change` fires with the new value; attrs (`id`, `name`)
+go to the `<input>`.
+
+**Props:** `modelValue`, `label`, `disabled`. **Slots:** `default` (rich label).
+**Emits:** `update:modelValue(value)`, `change(value)`.
+
+```vue
+<BaseCheckbox v-model="remember" id="remember" label="Remember me" />
+```
+
+### BaseToggle
+
+On/off switch (`role="switch"`). `v-model` is the boolean; `change` fires after
+every user toggle with the new value.
+
+**Props:** `modelValue`, `label` (visible label, also the accessible name),
+`ariaLabel` (when there is no label), `color: 'emerald' | 'red' | 'sky' | 'amber'`
+(on state, `'emerald'`), `offTone: 'slate' | 'red'` (off track, `'slate'`), `disabled`.
+**Emits:** `update:modelValue(value)`, `change(value)`.
+
+```vue
+<BaseToggle v-model="task.alive" :label="task.name" color="red" @change="save(task)" />
+<BaseToggle v-model="account.alive" off-tone="red" aria-label="Alive" />
+```
+
+### BaseAuthLayout
+
+Full-page, centred shell for sign-in / sign-up / password-recovery screens:
+logo on top (defaults to `BaseLogo`), then a bordered card with the title,
+content and an optional footer.
+
+**Props:** `title`, `subtitle`, `wide` (max-w-3xl card for multi-column forms; default max-w-md).
+**Slots:** `default` (form), `logo` (replaces `BaseLogo`), `footer` ("No account? Sign up").
+
+```vue
+<BaseAuthLayout title="Forgot password">
+  <form>…</form>
+  <template #footer>No account? <RouterLink to="/register">Sign up</RouterLink></template>
+</BaseAuthLayout>
+```
+
+### BaseBooleanBadge
+
+Yes/no pill for boolean columns: green check when true, red cross when false.
+
+**Props:** `value` (`boolean | null`), `trueLabel` (`'Yes'`), `falseLabel` (`'No'`).
+
+```vue
+<BaseBooleanBadge :value="user.hasVerifiedEmail" true-label="Verified" false-label="Not verified" />
+```
+
+### BaseDetailList
+
+Read-only label/value grid for detail pages (the "view" counterpart of a form).
+Empty values show `emptyText`; `href` renders the value as an external link;
+`mono` uses the monospace face.
+
+**Props:** `items: DetailItem[]` (`{ label, value?, href?, mono? }`, required),
+`columns: 1 | 2 | 3` (`2`, from `sm` up), `emptyText` (`'—'`).
+
+```vue
+<BaseCard title="Details">
+  <BaseDetailList :items="[{ label: 'Status', value: post.status }, { label: 'Link', value: post.link, href: post.link }]" />
+</BaseCard>
+```
 
 ## Composables
 

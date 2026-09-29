@@ -40,7 +40,7 @@ const props = defineProps({
   color: {
     type: String,
     required: false,
-    default: BaseButtonEnum.BLUE
+    default: BaseButtonEnum.GREEN
   },
   to: {
     type: String,
