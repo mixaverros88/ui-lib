@@ -88,3 +88,74 @@ html .dp--theme-dark {
   --dp-marker-color: #ef4444;
   --dp-tooltip-color: #1e293b;
 }
+
+/* BaseSelect: rounded, themed dropdown panel. Opt-in customizable <select>
+   (appearance: base-select, Chromium 135+); other browsers keep the native
+   popup, which can't be styled. The button skin comes from BaseSelect's
+   utilities, and its own ChevronDownIcon replaces the built-in picker icon. */
+@supports (appearance: base-select) {
+  .base-select,
+  .base-select::picker(select) {
+    appearance: base-select;
+  }
+
+  .base-select::picker-icon {
+    display: none;
+  }
+
+  .base-select::picker(select) {
+    margin-top: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid var(--color-slate-200);
+    border-radius: 0.75rem;
+    background-color: #fff;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+
+  .base-select option {
+    padding: 0.375rem 0.625rem;
+    border-radius: 0.5rem;
+    color: var(--color-slate-900);
+    cursor: pointer;
+  }
+
+  .base-select option::checkmark {
+    display: none;
+  }
+
+  .base-select option:hover,
+  .base-select option:focus-visible {
+    background-color: var(--color-slate-100);
+    outline: none;
+  }
+
+  .base-select option:checked {
+    background-color: var(--color-emerald-50);
+    color: var(--color-emerald-700);
+    font-weight: 500;
+  }
+
+  .base-select option:disabled {
+    color: var(--color-slate-400);
+    cursor: default;
+  }
+
+  .dark .base-select::picker(select) {
+    border-color: var(--color-slate-700);
+    background-color: var(--color-slate-900);
+  }
+
+  .dark .base-select option {
+    color: var(--color-slate-100);
+  }
+
+  .dark .base-select option:hover,
+  .dark .base-select option:focus-visible {
+    background-color: var(--color-slate-800);
+  }
+
+  .dark .base-select option:checked {
+    background-color: rgb(16 185 129 / 0.15);
+    color: var(--color-emerald-300);
+  }
+}

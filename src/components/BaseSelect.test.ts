@@ -35,3 +35,23 @@ describe('BaseSelect', () => {
     expect(wrapper.findAll('option').map((o) => o.text())).toEqual(['A', 'B'])
   })
 })
+
+describe('BaseSelect humanize', () => {
+  const enumSlots = {
+    default: '<option value="BLUE_SKY">BLUE_SKY</option><option v-for="o in [\'TICK_TOCK\']" :key="o" :value="o">{{ o }}</option>',
+  }
+
+  it('shows underscores as spaces but keeps raw option values', async () => {
+    const wrapper = mount(BaseSelect, { slots: enumSlots })
+    const options = wrapper.findAll('option')
+    expect(options.map((o) => o.text())).toEqual(['BLUE SKY', 'TICK TOCK'])
+    expect(options.map((o) => o.element.value)).toEqual(['BLUE_SKY', 'TICK_TOCK'])
+    await wrapper.find('select').setValue('TICK_TOCK')
+    expect(wrapper.emitted('update:modelValue')).toEqual([['TICK_TOCK']])
+  })
+
+  it('can be turned off with humanize=false', () => {
+    const wrapper = mount(BaseSelect, { props: { humanize: false }, slots: enumSlots })
+    expect(wrapper.findAll('option').map((o) => o.text())).toEqual(['BLUE_SKY', 'TICK_TOCK'])
+  })
+})

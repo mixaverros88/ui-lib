@@ -5,8 +5,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, createTextVNode, Text, useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
 import { ColorsEnums } from "../enums/ColorsEnums";
+import { humanizeTextVNodes } from '../utils/humanize'
 
 const slots = useSlots()
 const hasDefaultSlot = computed(() => !!slots.default)
@@ -14,12 +15,7 @@ const hasDefaultSlot = computed(() => !!slots.default)
 // Badge labels are often raw enum names (PROFIT_TARGET, RSI_REVERT); render
 // their underscores as spaces so callers don't have to humanize at every call
 // site. Only plain text nodes are rewritten — element children pass through.
-const BadgeContent = () =>
-  (slots.default?.() ?? []).map((node) =>
-    node.type === Text && typeof node.children === 'string'
-      ? createTextVNode(node.children.replace(/_/g, ' '))
-      : node
-  )
+const BadgeContent = () => humanizeTextVNodes(slots.default?.() ?? [])
 
 const props = defineProps({
   color: {

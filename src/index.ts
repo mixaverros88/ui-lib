@@ -149,5 +149,6 @@ export {
   isValidBase64,
 } from './utils/validate'
 export { buildSpecParams, firstInvalidNumericSpec } from './utils/specForm'
+export { humanizeEnum, humanizeTextVNodes } from './utils/humanize'
 export { computePnL } from './utils/pnl'
 export type { PnL, PnLInputs } from './utils/pnl'
