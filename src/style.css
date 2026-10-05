@@ -7,6 +7,12 @@
 
 @import "tailwindcss";
 
+/* Only real component sources may contribute utilities to the shipped CSS.
+   Test files mention class names in assertions/comments, and anything Tailwind
+   finds there would ship and can override consumer utilities (the lib CSS is
+   imported after the consumer's own). */
+@source not "./**/*.test.ts";
+
 /* Register the fonts as the Tailwind theme defaults. The compiled stylesheet
    re-declares theme variables in its :root, so in consumers that import this
    file after their own `@import "tailwindcss"` these values win the cascade

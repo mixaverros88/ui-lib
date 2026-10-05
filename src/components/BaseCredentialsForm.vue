@@ -170,7 +170,7 @@ const inputClass = 'placeholder:text-slate-400 dark:placeholder:text-slate-500 f
       </span>
     </div>
 
-    <div class="grid gap-4 md:grid-cols-2">
+    <div class="grid gap-4 md:grid-cols-[repeat(2,minmax(0,1fr))]">
       <div class="md:col-span-2">
         <label
           :for="`${idPrefix}-key-id`"

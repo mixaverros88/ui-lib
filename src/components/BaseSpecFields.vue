@@ -60,7 +60,7 @@ function onIntegerPaste(e: ClipboardEvent) {
 </script>
 
 <template>
-  <div class="grid gap-3 md:grid-cols-2">
+  <div class="grid gap-3 md:grid-cols-[repeat(2,minmax(0,1fr))]">
     <div v-for="spec in specs" :key="spec.key">
       <label
         v-if="spec.type !== 'boolean'"

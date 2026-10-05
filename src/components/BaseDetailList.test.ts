@@ -29,8 +29,8 @@ describe('BaseDetailList', () => {
   })
 
   it('switches the grid columns', () => {
-    expect(mount(BaseDetailList, { props: { items: [], columns: 1 } }).classes()).not.toContain('sm:grid-cols-2')
-    expect(mount(BaseDetailList, { props: { items: [] } }).classes()).toContain('sm:grid-cols-2')
-    expect(mount(BaseDetailList, { props: { items: [], columns: 3 } }).classes()).toContain('lg:grid-cols-3')
+    expect(mount(BaseDetailList, { props: { items: [], columns: 1 } }).classes()).not.toContain('sm:grid-cols-[repeat(2,minmax(0,1fr))]')
+    expect(mount(BaseDetailList, { props: { items: [] } }).classes()).toContain('sm:grid-cols-[repeat(2,minmax(0,1fr))]')
+    expect(mount(BaseDetailList, { props: { items: [], columns: 3 } }).classes()).toContain('lg:grid-cols-[repeat(3,minmax(0,1fr))]')
   })
 })

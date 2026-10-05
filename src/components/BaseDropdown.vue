@@ -94,6 +94,13 @@ interface Props {
   triggerClass?: string
   /** Chevron sizing/colour classes; shrink for compact triggers. */
   chevronClass?: string
+  /**
+   * Colour of the default trigger skin, keeping the standard `size` padding:
+   * 'neutral' (slate, default), 'success' (emerald) or 'danger' (red). Use it
+   * for a status dropdown (e.g. Active / Paused) that should match the height
+   * of the plain dropdowns beside it. Ignored when `triggerClass` is set.
+   */
+  tone?: 'neutral' | 'success' | 'danger'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -105,6 +112,7 @@ const props = withDefaults(defineProps<Props>(), {
   ariaLabel: '',
   triggerClass: '',
   chevronClass: 'w-5 h-5 text-slate-500 dark:text-slate-400',
+  tone: 'neutral',
 })
 
 const emit = defineEmits<{
@@ -126,14 +134,22 @@ const triggerClass = computed(() => {
     'cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed '
   if (props.triggerClass) return layout + props.triggerClass
   const padding = props.size === 'sm' ? 'px-3 py-2' : 'px-4 py-2.5'
-  return (
-    layout +
-    'rounded-lg border text-sm ' +
-    'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-100 ' +
-    'hover:bg-slate-50 dark:hover:bg-slate-800 ' +
-    padding
-  )
+  return layout + 'rounded-lg border text-sm ' + TONE_SKIN[props.tone] + ' ' + padding
 })
+
+// Full literal class strings (no concatenated fragments) so Tailwind's
+// scanner keeps every one of them in consumer builds.
+const TONE_SKIN: Record<NonNullable<Props['tone']>, string> = {
+  neutral:
+    'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-100 ' +
+    'hover:bg-slate-50 dark:hover:bg-slate-800',
+  success:
+    'font-medium border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 ' +
+    'hover:bg-emerald-100 dark:hover:bg-emerald-900/50',
+  danger:
+    'font-medium border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 ' +
+    'hover:bg-red-100 dark:hover:bg-red-900/50',
+}
 
 function rowClass(opt: DropdownOption): string {
   const selected = opt.value === props.modelValue

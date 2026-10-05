@@ -1,5 +1,5 @@
 <template>
-  <dl class="grid grid-cols-1 gap-x-6 gap-y-4 text-left" :class="columns === 2 ? 'sm:grid-cols-2' : columns === 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : ''">
+  <dl class="grid grid-cols-[minmax(0,1fr)] gap-x-6 gap-y-4 text-left" :class="columns === 2 ? 'sm:grid-cols-[repeat(2,minmax(0,1fr))]' : columns === 3 ? 'sm:grid-cols-[repeat(2,minmax(0,1fr))] lg:grid-cols-[repeat(3,minmax(0,1fr))]' : ''">
     <div v-for="item in items" :key="item.label" class="min-w-0">
       <dt class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ item.label }}</dt>
       <dd class="mt-1 break-words text-sm text-slate-900 dark:text-slate-100" :class="item.mono ? 'font-mono' : ''">
@@ -18,6 +18,10 @@
 </template>
 
 <script setup lang="ts">
+// Column classes use the arbitrary-value form on purpose (see
+// noSharedResponsiveGrid.test.ts): plain responsive column utilities would ship
+// in the lib CSS, which consumers import AFTER their own utilities, and override
+// the consumers' larger-breakpoint grid columns.
 /**
  * Read-only label/value grid for detail pages — the "view" counterpart of a
  * form. Empty values render `emptyText` (—); `href` makes the value an

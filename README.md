@@ -1472,6 +1472,7 @@ it.
 | `ariaLabel`   | `String`                   | `''`         | Accessible name for the trigger/listbox when there is no visible label. |
 | `triggerClass`| `String`                   | `''`         | Replaces the trigger's default slate skin entirely (including the `size` padding). |
 | `chevronClass`| `String`                   | `'w-5 h-5 text-slate-500 dark:text-slate-400'` | Classes for the chevron icon. |
+| `tone`        | `'neutral' \| 'success' \| 'danger'` | `'neutral'` | Tints the default skin (slate / emerald / red) while keeping the `size` padding — e.g. an Active/Paused status dropdown. Ignored when `triggerClass` is set. |
 
 **Emits:** `update:modelValue(value)`.
 

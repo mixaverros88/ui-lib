@@ -84,4 +84,19 @@ describe('BaseDropdown', () => {
     expect(chevron.classes()).toContain('w-3')
     expect(chevron.classes()).not.toContain('w-5')
   })
+
+  it('tints the default skin by tone while keeping the size padding', () => {
+    const danger = mount(BaseDropdown, { props: { options, modelValue: '1', size: 'sm', tone: 'danger' } })
+    const cls = danger.get('button').classes()
+    expect(cls).toEqual(expect.arrayContaining(['border-red-300', 'bg-red-50', 'text-red-700', 'px-3', 'py-2']))
+    expect(cls).not.toContain('bg-white')
+
+    const success = mount(BaseDropdown, { props: { options, modelValue: '1', tone: 'success' } })
+    expect(success.get('button').classes()).toEqual(expect.arrayContaining(['bg-emerald-50', 'px-4']))
+  })
+
+  it('defaults to the neutral slate skin', () => {
+    const wrapper = mount(BaseDropdown, { props: { options, modelValue: null } })
+    expect(wrapper.get('button').classes()).toContain('bg-white')
+  })
 })
