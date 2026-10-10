@@ -21,6 +21,12 @@ const props = defineProps({
   color: {
     type: String,
     required: false
+  },
+  // Pulse the badge to flag a live / in-progress state (e.g. an OPEN
+  // position). Honours prefers-reduced-motion.
+  blink: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -38,6 +44,7 @@ const defaultColor = 'bg-red-100 text-red-700 border-red-200'
 
 const badgeClasses = computed(() => {
   const colorClasses = (props.color && colorMap[props.color]) || defaultColor
-  return `inline-flex items-center gap-1 font-semibold text-xs leading-none px-3 py-1.5 rounded-full border ${colorClasses}`
+  const blinkClasses = props.blink ? ' animate-pulse motion-reduce:animate-none' : ''
+  return `inline-flex items-center gap-1 font-semibold text-xs leading-none px-3 py-1.5 rounded-full border ${colorClasses}${blinkClasses}`
 })
 </script>

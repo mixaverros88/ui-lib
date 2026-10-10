@@ -54,6 +54,7 @@ const safelist = [
   'bg-gray-100',   'text-gray-700',   'border-gray-200',
   'bg-gray-50',    'text-gray-600',
   'bg-gray-800',   'text-gray-100',   'border-gray-700',
+  'animate-pulse', 'motion-reduce:animate-none',
   'inline-flex',
   'gap-1',
   'font-semibold',
