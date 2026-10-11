@@ -8,6 +8,7 @@ import {
   fmtPrice,
   fmtPct,
   fmtUsd,
+  fmtMoney,
   fmtDuration,
   formatJson,
   stringifyValue,
@@ -260,5 +261,30 @@ describe('stringifyValue', () => {
   })
   it('falls back to String() when JSON.stringify throws', () => {
     expect(stringifyValue(1n)).toBe('1')
+  })
+})
+
+describe('fmtMoney', () => {
+  it('puts the minus before the currency and groups digits', () => {
+    expect(fmtMoney(-2.26)).toBe('-$2.26')
+    expect(fmtMoney(1234.5)).toBe(`$${(1234.5).toLocaleString(undefined, { minimumFractionDigits: 2 })}`)
+    expect(fmtMoney(0)).toBe('$0.00')
+  })
+
+  it('honours digits and currency', () => {
+    expect(fmtMoney(1.5, 3)).toBe('$1.500')
+    expect(fmtMoney(-3, 2, '€')).toBe('-€3.00')
+  })
+
+  it('does not sign a value that rounds to zero', () => {
+    expect(fmtMoney(-0.001)).toBe('$0.00')
+  })
+
+  it('renders an em-dash for missing input and accepts numeric strings', () => {
+    expect(fmtMoney(null)).toBe('—')
+    expect(fmtMoney(undefined)).toBe('—')
+    expect(fmtMoney('')).toBe('—')
+    expect(fmtMoney(NaN)).toBe('—')
+    expect(fmtMoney('-4.5')).toBe('-$4.50')
   })
 })

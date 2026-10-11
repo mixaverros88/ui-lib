@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
   totalItems: {
@@ -28,26 +28,55 @@ const props = defineProps({
   itemsPerPage: {
     type: Number,
     default: 20
+  },
+  // Optional CONTROLLED current page (1-based). When set, the highlighted
+  // page follows this prop instead of internal state, so a page restored
+  // from the URL (?page=N) renders as N rather than 1. Clicks still emit
+  // `page-changed`; the parent is expected to feed the new page back in.
+  // Left undefined, the component keeps its own state (uncontrolled).
+  page: {
+    type: Number,
+    default: undefined
   }
 })
 
-const currentPage = ref(1);
-const totalPages = ref(0);
-const cells = ref([] as number[]);
 const emit = defineEmits(['page-changed']);
 
-// Rebuild the visible cells around `page`. A cell value of 0 renders as
+// Guard against a missing/zero page size or total (e.g. a reset form that
+// nulled them): fall back to 20 per page / 0 items instead of rendering
+// "Infinity" or "NaN" pages.
+const totalPages = computed(() => {
+  const perPage = Number(props.itemsPerPage) > 0 ? Number(props.itemsPerPage) : 20;
+  const total = Number(props.totalItems) > 0 ? Number(props.totalItems) : 0;
+  return Math.ceil(total / perPage);
+});
+
+function clamp(p: number): number {
+  return Math.min(Math.max(p, 1), Math.max(totalPages.value, 1));
+}
+
+const internalPage = ref(1);
+// The total shrinking under the current page snaps it to the last page.
+watch(totalPages, () => {
+  internalPage.value = clamp(internalPage.value);
+});
+
+const currentPage = computed(() =>
+  props.page != null && Number.isFinite(props.page) ? clamp(props.page) : internalPage.value
+);
+
+// The visible cells around the current page. A cell value of 0 renders as
 // an ellipsis. The window is the current page ± 2 neighbours, plus the
 // first/last page with an ellipsis only when pages are actually hidden.
-function buildCells(page: number) {
-  if (totalPages.value <= 5) {
-    cells.value = Array.from({ length: totalPages.value }, (_, i) => i + 1);
-    return;
+const cells = computed(() => {
+  const total = totalPages.value;
+  if (total <= 5) {
+    return Array.from({ length: total }, (_, i) => i + 1);
   }
 
   const out: number[] = [];
-  const start = Math.max(1, page - 2);
-  const end = Math.min(totalPages.value, page + 2);
+  const start = Math.max(1, currentPage.value - 2);
+  const end = Math.min(total, currentPage.value + 2);
 
   if (start > 1) {
     out.push(1);
@@ -56,32 +85,18 @@ function buildCells(page: number) {
   for (let i = start; i <= end; i++) {
     out.push(i);
   }
-  if (end < totalPages.value) {
-    if (end < totalPages.value - 1) out.push(0);
-    out.push(totalPages.value);
+  if (end < total) {
+    if (end < total - 1) out.push(0);
+    out.push(total);
   }
-  cells.value = out;
-}
+  return out;
+});
 
 function changePage(pageNumber: number) {
   if (pageNumber === currentPage.value || pageNumber < 1 || pageNumber > totalPages.value) {
     return;
   }
-  currentPage.value = pageNumber;
-  buildCells(pageNumber);
+  internalPage.value = pageNumber;
   emit('page-changed', pageNumber);
 }
-
-watch(() => [props.totalItems, props.itemsPerPage], () => {
-  // Guard against a missing/zero page size or total (e.g. a reset form that
-  // nulled them): fall back to 20 per page / 0 items instead of rendering
-  // "Infinity" or "NaN" pages.
-  const perPage = Number(props.itemsPerPage) > 0 ? Number(props.itemsPerPage) : 20;
-  const total = Number(props.totalItems) > 0 ? Number(props.totalItems) : 0;
-  totalPages.value = Math.ceil(total / perPage);
-  if (currentPage.value > totalPages.value) {
-    currentPage.value = Math.max(1, totalPages.value);
-  }
-  buildCells(currentPage.value);
-}, { immediate: true })
 </script>

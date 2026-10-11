@@ -112,6 +112,31 @@ export function fmtUsd(v: number): string {
 }
 
 /**
+ * Format a money amount with the sign BEFORE the currency symbol ("-$2.26",
+ * never "$-2.26") and locale digit grouping ("$1,234.50"). Positive values
+ * carry no sign — prefix an explicit '+' where a gain should read signed.
+ * Renders an em-dash for null/undefined/non-finite input; accepts numeric
+ * strings so BigDecimal-as-string payloads pass through.
+ */
+export function fmtMoney(
+  n: number | string | null | undefined,
+  digits = 2,
+  currency = '$',
+): string {
+  if (n === null || n === undefined) return EM_DASH
+  if (typeof n === 'string' && n.trim() === '') return EM_DASH
+  const v = typeof n === 'string' ? Number(n) : n
+  if (!isFinite(v)) return EM_DASH
+  const abs = Math.abs(v).toLocaleString(undefined, {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  })
+  // A value that rounds to zero ("-0.00") reads unsigned.
+  const negative = v < 0 && Number(Math.abs(v).toFixed(digits)) !== 0
+  return `${negative ? '-' : ''}${currency}${abs}`
+}
+
+/**
  * Format an ISO date string / epoch as a "Mon D, YYYY" calendar label
  * (en-US, e.g. "Jan 5, 2026"). Falls back to the raw value on parse
  * failure and an em-dash on empty input.

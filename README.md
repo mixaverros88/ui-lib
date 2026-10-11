@@ -519,6 +519,7 @@ Page navigation with smart ellipsis for large page counts.
 | -------------- | -------- | ------- | ----------------------- |
 | `totalItems`   | `Number` | **required** | Total number of items   |
 | `itemsPerPage` | `Number` | `20`    | Items shown per page    |
+| `page`         | `Number` | —       | Optional **controlled** current page (1-based, since 1.45.0). When set, the highlight follows this prop instead of internal state — pass it whenever the page can be restored from the URL, or the pager shows page 1 over page N's rows. Out-of-range values clamp to the last page. Omit for the old uncontrolled behaviour. |
 
 **Events:**
 
@@ -535,11 +536,20 @@ Page navigation with smart ellipsis for large page counts.
     :itemsPerPage="10"
     @page-changed="onPageChange"
   />
+  <!-- Controlled: the parent owns the page (e.g. mirrored to ?page=). -->
+  <Pagination
+    :page="page"
+    :totalItems="200"
+    :itemsPerPage="10"
+    @page-changed="(p) => (page = p)"
+  />
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Pagination } from 'mgv-backoffice'
 
+const page = ref(3)
 const onPageChange = (page: number) => {
   console.log('Page:', page)
 }
@@ -734,13 +744,14 @@ import {
   fmtPrice,
   fmtPct,
   fmtUsd,
+  fmtMoney,
   // …plus fmtDateTimeMs, fmtCalendarDate, fmtCalendarDateTime,
   // fmtMsAsSeconds, fmtBytes, fmtDuration, formatJson, stringifyValue
 } from 'mgv-backoffice'
 ```
 
 Locale-aware, pure, dependency-free formatters for tables, logs and charts.
-`fmtNumber`, `fmtDate`, `fmtCalendarDate`, `fmtCalendarDateTime` and
+`fmtNumber`, `fmtMoney`, `fmtDate`, `fmtCalendarDate`, `fmtCalendarDateTime` and
 `fmtDuration` handle missing/non-finite input gracefully (rendering an
 em-dash) so raw API values can be passed without pre-sanitising; the
 epoch/numeric formatters (`fmtDateTime`, `fmtDateShort`, `fmtDateTimeMs`,
@@ -762,6 +773,7 @@ epoch/numeric formatters (`fmtDateTime`, `fmtDateShort`, `fmtDateTimeMs`,
 | `fmtPrice`     | `(n: number) => string`                                         | Price with precision that scales to magnitude (more decimals for sub-cent values). |
 | `fmtPct`       | `(n: number, digits = 2) => string`                             | Percentage with explicit sign, e.g. `"+2.50%"`. |
 | `fmtUsd`       | `(v: number) => string`                                         | Signed USD amount with leading sign, e.g. `"+$5.00"`. |
+| `fmtMoney`     | `(n: number \| string \| null \| undefined, digits = 2, currency = '$') => string` | Money with the minus BEFORE the currency (`"-$2.26"`, never `"$-2.26"`), digit grouping, no `+` on gains; a value rounding to zero reads unsigned; em-dash for missing input (since 1.45.0). |
 | `formatJson`   | `(content: string) => string`                                   | Pretty-prints parseable JSON with 2-space indentation; returns anything else verbatim. |
 | `stringifyValue` | `(value: unknown) => string`                                  | Display string for an unknown value: strings pass through, null/undefined → `''`, everything else JSON-serialized (`String()` fallback). |
 
@@ -1770,6 +1782,35 @@ Extracted from TradeAutomation's variant-stats modal.
 
 ---
 
+### BaseGroupedChecklist
+
+Grouped multi-select checklist (since 1.46.0): a master "Select all (N)"
+checkbox, a per-group select-all, and one checkbox per item. Built for
+"pick which records this action applies to" confirmation modals. Empty groups
+are not rendered; items are plain strings, unique across groups.
+
+| Prop             | Type                       | Default            | Description |
+| ---------------- | -------------------------- | ------------------ | ----------- |
+| `groups`         | `ChecklistGroup[]`         | **required**       | `{ key, label, items: string[] }` per group, in display order. |
+| `modelValue`     | `string[]`                 | **required**       | Selected items (`v-model`); emitted in group order. |
+| `allLabel`       | `string`                   | `'Select all'`     | Master checkbox text; group checkboxes are labelled `"<allLabel> <group label>"`. |
+| `allAriaLabel`   | `string`                   | `'Select all items'` | Accessible name of the master checkbox. |
+| `itemAriaLabel`  | `(item: string) => string` | the item itself    | Accessible name per item checkbox. |
+| `mono`           | `boolean`                  | `false`            | Monospace item labels (tickers, ids). |
+| `maxHeightClass` | `string`                   | `'max-h-72'`       | Scroll cap of the group list. |
+
+```vue
+<BaseGroupedChecklist
+  v-model="selected"
+  :groups="[{ key: 'STOCK', label: 'Stocks', items: ['AMD', 'NVDA'] }]"
+  all-aria-label="Select all symbols"
+  :item-aria-label="(s) => `Apply to ${s}`"
+  mono
+/>
+```
+
+---
+
 ### BaseSearchSelect
 
 Searchable select (combobox): type to filter, pick with the mouse or
@@ -1938,11 +1979,16 @@ import {
   useQueryParamSync,
   useFieldClasses,
   usePolling,
+  useLatestRequest,
+  isAbortError,
+  useDirtyState,
+  stableStringify,
 } from 'mgv-backoffice'
 import type {
   UseThemeOptions,
   UseSidebarCollapseOptions,
   UsePollingOptions,
+  LatestRequestToken,
 } from 'mgv-backoffice'
 ```
 
@@ -1960,6 +2006,8 @@ import type {
 | `useQueryParamSync()` | URL-query mirroring for filterable views: `{ qparam(name), qenum(name, allowed, fallback), replaceQuery(next) }`. Read filters from the query string once on setup, write changes back with `router.replace` (no-op when unchanged) so filtered views stay shareable without polluting history. |
 | `useFieldClasses()` | Shared form-field class strings for the gray/emerald form skin: `{ label, input, requiredInput(value) }`. `requiredInput` returns a red border+ring skin while the value is empty and the standard skin otherwise. |
 | `usePolling(fn, intervalMs, { immediate?, pauseWhenHidden? })` | Visibility-gated polling loop bound to the component lifecycle: starts on mount, stops on unmount, pauses while the tab is hidden and refreshes + resumes on return to visible (both default on). Pass `intervalMs: null` for refresh-only mode (run on mount + each return-to-visible, no timer). Returns `{ start, stop, active }`. A loop stopped via `stop()` stays stopped across hide/show cycles (since 1.36.0) — only a visibility-paused loop auto-resumes. Catch errors inside `fn` — the loop never swallows rejections. |
+| `useLatestRequest()` | "Latest request wins" guard for views that refetch on filter changes / polls / Refresh (since 1.45.0). `begin()` aborts the previous in-flight request and returns `{ signal, isLatest() }` — pass `signal` to `fetch`, and check `isLatest()` after every `await` before writing state (and before clearing a loading flag in `finally`). `cancel()` aborts + invalidates without starting a new request. Auto-cancels on unmount when called in setup. Pair with `isAbortError(e)` to swallow superseded requests silently. |
+| `useDirtyState(snapshot)` | Unsaved-changes tracking for edit forms (since 1.46.0): `snapshot()` returns the form state (read reactively); `dirty` is true while it differs from the last baseline, `markClean()` makes the current state the baseline (call after load / save). Structural, key-order-insensitive comparison via `stableStringify` (also exported), so a server echo that reorders keys never reads as an edit. |
 
 ---
 

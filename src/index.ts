@@ -51,6 +51,7 @@ export { default as BaseFilterChip } from './components/BaseFilterChip.vue'
 export { default as BaseCredentialsForm } from './components/BaseCredentialsForm.vue'
 export { default as BasePillPickerModal } from './components/BasePillPickerModal.vue'
 export { default as BaseBarDistribution } from './components/BaseBarDistribution.vue'
+export { default as BaseGroupedChecklist } from './components/BaseGroupedChecklist.vue'
 export type { CredentialsView, CredentialsUpdate } from './components/BaseCredentialsForm.vue'
 
 // Components — third-party wrappers
@@ -85,6 +86,9 @@ export { useFieldClasses } from './composables/useFieldClasses'
 export type { FieldClasses } from './composables/useFieldClasses'
 export { usePolling } from './composables/usePolling'
 export type { UsePollingOptions } from './composables/usePolling'
+export { useLatestRequest, isAbortError } from './composables/useLatestRequest'
+export { useDirtyState, stableStringify } from './composables/useDirtyState'
+export type { LatestRequestToken } from './composables/useLatestRequest'
 
 // Enums
 export { AlertEnum } from './enums/AlertEnum'
@@ -111,6 +115,7 @@ export type { SpecField, SpecFieldType, SpecFieldValue } from './types/specField
 export type { StatBreakdownItem } from './types/statBreakdown'
 export type { PillPickerItem } from './types/pillPicker'
 export type { DistributionBar } from './types/distribution'
+export type { ChecklistGroup } from './types/checklist'
 
 // Utils
 export { getBaseColor, getBaseColorOf } from './utils/util'
@@ -138,6 +143,7 @@ export {
   fmtPrice,
   fmtPct,
   fmtUsd,
+  fmtMoney,
   fmtDuration,
   formatJson,
   stringifyValue,

@@ -90,4 +90,43 @@ describe('Pagination', () => {
       expect(wrapper.findAll('button').map((b) => b.text()).filter((t) => /^\d+$/.test(t))).toEqual(['1'])
     }
   })
+
+  describe('controlled (page prop)', () => {
+    it('highlights the page passed in, e.g. one restored from the URL', () => {
+      const wrapper = mount(Pagination, {
+        props: { totalItems: 200, itemsPerPage: 20, page: 5 },
+      })
+      expect(wrapper.find('button.active').text()).toBe('5')
+      expect(cellLabels(wrapper)).toEqual(['1', '...', '3', '4', '5', '6', '7', '...', '10'])
+    })
+
+    it('lets the user go back to page 1 from a restored page', async () => {
+      // Regression: the uncontrolled widget always started on page 1, so with
+      // a restored ?page=3 clicking "1" was swallowed as "already active".
+      const wrapper = mount(Pagination, {
+        props: { totalItems: 200, itemsPerPage: 20, page: 3 },
+      })
+      await clickPage(wrapper, 1)
+      expect(wrapper.emitted('page-changed')).toEqual([[1]])
+    })
+
+    it('follows the prop rather than its own clicks', async () => {
+      const wrapper = mount(Pagination, {
+        props: { totalItems: 200, itemsPerPage: 20, page: 2 },
+      })
+      await clickPage(wrapper, 4)
+      expect(wrapper.emitted('page-changed')).toEqual([[4]])
+      // The parent hasn't accepted the change yet — the highlight stays put.
+      expect(wrapper.find('button.active').text()).toBe('2')
+      await wrapper.setProps({ page: 4 })
+      expect(wrapper.find('button.active').text()).toBe('4')
+    })
+
+    it('clamps an out-of-range page to the last page', () => {
+      const wrapper = mount(Pagination, {
+        props: { totalItems: 40, itemsPerPage: 20, page: 9 },
+      })
+      expect(wrapper.find('button.active').text()).toBe('2')
+    })
+  })
 })
