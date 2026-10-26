@@ -136,6 +136,48 @@ export function fmtMoney(
   return `${negative ? '-' : ''}${currency}${abs}`
 }
 
+// Symbols for the fiat currencies that have one. USD stablecoins (USDT,
+// USDC) are not here: they read as "$" via DOLLAR_LIKE below.
+const CURRENCY_SYMBOLS: Record<string, string> = { EUR: '€', GBP: '£' }
+const DOLLAR_LIKE = new Set(['USD', 'USDT', 'USDC'])
+
+/**
+ * Display symbol for an ISO / ticker currency code: "€" for EUR, "£" for
+ * GBP, "$" for USD and the USD stablecoins — and for a missing code, so
+ * rows with no currency keep reading as dollars. Any other code (BTC,
+ * ETH, …) has no symbol and returns null; callers suffix the code instead.
+ */
+export function currencySymbol(code: string | null | undefined): string | null {
+  const c = (code ?? '').trim().toUpperCase()
+  if (!c || DOLLAR_LIKE.has(c)) return '$'
+  return CURRENCY_SYMBOLS[c] ?? null
+}
+
+/**
+ * Format an amount in its own currency: fiat with a symbol goes through
+ * fmtMoney ("€20.00", "-$1.50"), a USD stablecoin keeps its ticker after
+ * the dollar figure ("$25.00 USDT") so it isn't mistaken for cash, and any
+ * other asset prints as a plain quantity with its code ("0.5 BTC", up to 8
+ * decimals). Em-dash for missing / non-finite amounts, like fmtMoney.
+ */
+export function fmtCurrencyAmount(
+  n: number | string | null | undefined,
+  code: string | null | undefined,
+  digits = 2,
+): string {
+  const c = (code ?? '').trim().toUpperCase()
+  const symbol = currencySymbol(c)
+  if (symbol !== null) {
+    const money = fmtMoney(n, digits, symbol)
+    return c && c !== 'USD' && DOLLAR_LIKE.has(c) && money !== EM_DASH ? `${money} ${c}` : money
+  }
+  if (n === null || n === undefined) return EM_DASH
+  if (typeof n === 'string' && n.trim() === '') return EM_DASH
+  const v = typeof n === 'string' ? Number(n) : n
+  if (!isFinite(v)) return EM_DASH
+  return `${v.toLocaleString(undefined, { maximumFractionDigits: 8 })} ${c}`
+}
+
 /**
  * Format an ISO date string / epoch as a "Mon D, YYYY" calendar label
  * (en-US, e.g. "Jan 5, 2026"). Falls back to the raw value on parse

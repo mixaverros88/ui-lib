@@ -9,6 +9,8 @@ import {
   fmtPct,
   fmtUsd,
   fmtMoney,
+  currencySymbol,
+  fmtCurrencyAmount,
   fmtDuration,
   formatJson,
   stringifyValue,
@@ -286,5 +288,35 @@ describe('fmtMoney', () => {
     expect(fmtMoney('')).toBe('—')
     expect(fmtMoney(NaN)).toBe('—')
     expect(fmtMoney('-4.5')).toBe('-$4.50')
+  })
+})
+
+describe('currencySymbol', () => {
+  it('maps fiat codes and treats USD stablecoins / missing codes as dollars', () => {
+    expect(currencySymbol('EUR')).toBe('€')
+    expect(currencySymbol('gbp')).toBe('£')
+    expect(currencySymbol('USDC')).toBe('$')
+    expect(currencySymbol(null)).toBe('$')
+    expect(currencySymbol('BTC')).toBeNull()
+  })
+})
+
+describe('fmtCurrencyAmount', () => {
+  it('formats fiat with its own symbol, sign before the currency', () => {
+    expect(fmtCurrencyAmount(20, 'EUR')).toBe('€20.00')
+    expect(fmtCurrencyAmount(-1.5, 'USD')).toBe('-$1.50')
+  })
+
+  it('keeps the stablecoin ticker after a dollar figure', () => {
+    expect(fmtCurrencyAmount(25, 'USDT')).toBe('$25.00 USDT')
+  })
+
+  it('prints other assets as a quantity with their code', () => {
+    expect(fmtCurrencyAmount(0.5, 'BTC')).toBe(`${(0.5).toLocaleString()} BTC`)
+  })
+
+  it('renders an em-dash for missing amounts', () => {
+    expect(fmtCurrencyAmount(null, 'EUR')).toBe('—')
+    expect(fmtCurrencyAmount(undefined, 'BTC')).toBe('—')
   })
 })

@@ -52,6 +52,7 @@ export { default as BaseCredentialsForm } from './components/BaseCredentialsForm
 export { default as BasePillPickerModal } from './components/BasePillPickerModal.vue'
 export { default as BaseBarDistribution } from './components/BaseBarDistribution.vue'
 export { default as BaseGroupedChecklist } from './components/BaseGroupedChecklist.vue'
+export { default as BaseIdChip } from './components/BaseIdChip.vue'
 export type { CredentialsView, CredentialsUpdate } from './components/BaseCredentialsForm.vue'
 
 // Components — third-party wrappers
@@ -144,6 +145,8 @@ export {
   fmtPct,
   fmtUsd,
   fmtMoney,
+  currencySymbol,
+  fmtCurrencyAmount,
   fmtDuration,
   formatJson,
   stringifyValue,

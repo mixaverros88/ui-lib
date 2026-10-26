@@ -774,6 +774,8 @@ epoch/numeric formatters (`fmtDateTime`, `fmtDateShort`, `fmtDateTimeMs`,
 | `fmtPct`       | `(n: number, digits = 2) => string`                             | Percentage with explicit sign, e.g. `"+2.50%"`. |
 | `fmtUsd`       | `(v: number) => string`                                         | Signed USD amount with leading sign, e.g. `"+$5.00"`. |
 | `fmtMoney`     | `(n: number \| string \| null \| undefined, digits = 2, currency = '$') => string` | Money with the minus BEFORE the currency (`"-$2.26"`, never `"$-2.26"`), digit grouping, no `+` on gains; a value rounding to zero reads unsigned; em-dash for missing input (since 1.45.0). |
+| `currencySymbol` | `(code: string \| null \| undefined) => string \| null` | Display symbol for a currency code: `€` EUR, `£` GBP, `$` for USD, USDT, USDC and a missing code; `null` for anything else (BTC, ETH…) so the caller suffixes the code (since 1.47.0). |
+| `fmtCurrencyAmount` | `(n, code, digits = 2) => string` | An amount in its own currency: `"€20.00"`, `"-$1.50"`, `"$25.00 USDT"` (stablecoin ticker kept), `"0.5 BTC"` (plain quantity, up to 8 decimals); em-dash for missing input (since 1.47.0). |
 | `formatJson`   | `(content: string) => string`                                   | Pretty-prints parseable JSON with 2-space indentation; returns anything else verbatim. |
 | `stringifyValue` | `(value: unknown) => string`                                  | Display string for an unknown value: strings pass through, null/undefined → `''`, everything else JSON-serialized (`String()` fallback). |
 
@@ -1807,6 +1809,28 @@ are not rendered; items are plain strings, unique across groups.
   :item-aria-label="(s) => `Apply to ${s}`"
   mono
 />
+```
+
+---
+
+### BaseIdChip
+
+Compact id cell (since 1.47.0): a small uppercase label, the id truncated in a
+`<code>` pill with the full value in its tooltip, a copy button, and an optional
+magnifier button. Built for dense rows that carry several ids side by side.
+
+| Prop            | Type     | Default              | Description |
+| --------------- | -------- | -------------------- | ----------- |
+| `value`         | `string` | **required**         | The id — shown truncated, copied in full. |
+| `label`         | `string` | `''`                 | Uppercase prefix (`"id"`, `"ord"`). |
+| `copyLabel`     | `string` | `"<label> <value>"`  | Noun for the copy button's tooltip / aria-label. |
+| `actionLabel`   | `string` | —                    | Tooltip / aria-label of the magnifier button; the button renders only when set. |
+| `maxWidthClass` | `string` | `'max-w-[90px]'`     | Width cap of the truncated id. |
+
+Emits `action(value)` when the magnifier is clicked.
+
+```vue
+<BaseIdChip label="ord" :value="row.buyOrderId" action-label="Search this order id" @action="search" />
 ```
 
 ---
