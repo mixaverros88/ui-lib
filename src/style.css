@@ -31,10 +31,106 @@
    over plain base utilities like bg-slate-50 on a cascade tie. */
 @custom-variant dark (&:is(.dark, .dark *));
 
+/* Design system ("Night Terminal"): remapping the gray/slate/emerald ramps
+   restyles every lib component and every consumer utility, since they all
+   resolve colours via var() at runtime.
+   - gray/slate: one blue-tinted ramp (deep navy dark mode, cool paper light mode)
+   - emerald: terminal green, the brand accent
+   Deliberately a plain block, NOT `@theme`: `@theme` output lands in
+   `@layer theme`, where whichever stylesheet loads last wins, so a consumer
+   importing this file before its own `@import "tailwindcss"` would silently
+   get the default palette back. An unlayered rule beats every layer in any
+   import order. Consumers re-brand with their own plain `:root` block loaded
+   after this stylesheet. */
+:root, :host {
+  --color-gray-50: #f6f8fc;
+  --color-gray-100: #eef1f8;
+  --color-gray-200: #dee4ef;
+  --color-gray-300: #c4cede;
+  --color-gray-400: #94a3bd;
+  --color-gray-500: #65748f;
+  --color-gray-600: #475572;
+  --color-gray-700: #33415c;
+  --color-gray-800: #1c2942;
+  --color-gray-900: #101a30;
+  --color-gray-950: #070d1d;
+
+  --color-slate-50: #f6f8fc;
+  --color-slate-100: #eef1f8;
+  --color-slate-200: #dee4ef;
+  --color-slate-300: #c4cede;
+  --color-slate-400: #94a3bd;
+  --color-slate-500: #65748f;
+  --color-slate-600: #475572;
+  --color-slate-700: #33415c;
+  --color-slate-800: #1c2942;
+  --color-slate-900: #101a30;
+  --color-slate-950: #070d1d;
+
+  --color-emerald-50: #eafbf4;
+  --color-emerald-100: #d0f7e6;
+  --color-emerald-200: #a4efd0;
+  --color-emerald-300: #6fe3b5;
+  --color-emerald-400: #3ad597;
+  --color-emerald-500: #16c784;
+  --color-emerald-600: #0e9f68;
+  --color-emerald-700: #0b7d52;
+  --color-emerald-800: #0c6343;
+  --color-emerald-900: #0a5138;
+  --color-emerald-950: #042e1f;
+
+  --radius-lg: 0.625rem;
+  --radius-xl: 0.875rem;
+}
+
 /* Apply the brand font app-wide. Plain body rule (not preflight-dependent) so
-   it also styles consumers whose own Tailwind preflight came earlier. */
+   it also styles consumers whose own Tailwind preflight came earlier.
+   Tabular numerals line up digits in KPI cards and tables. */
 body {
   font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  text-rendering: optimizeLegibility;
+}
+
+/* Global polish. In `base` so component utilities (focus:outline-none,
+   cursor-*) still win. */
+@layer base {
+  /* Keyboard-focus affordance in the accent colour (mouse clicks stay clean). */
+  :focus-visible {
+    outline: 2px solid var(--color-emerald-500);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-emerald-500) 30%, transparent);
+  }
+
+  /* Slim, theme-aware scrollbars for data-dense tables and logs. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-gray-300) transparent;
+  }
+
+  .dark * {
+    scrollbar-color: var(--color-gray-700) transparent;
+  }
+
+  /* Tailwind v4 dropped the pointer cursor on buttons; restore it everywhere. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  input[type="button"]:not(:disabled),
+  input[type="submit"]:not(:disabled),
+  input[type="reset"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  input[type="button"]:disabled,
+  input[type="submit"]:disabled,
+  input[type="reset"]:disabled {
+    cursor: not-allowed;
+  }
 }
 
 /* BaseDateTimePicker skin: re-point @vuepic/vue-datepicker's CSS variables at
@@ -53,46 +149,46 @@ html .dp--theme-dark {
 }
 html .dp--theme-light {
   --dp-background-color: #fff;      /* white, like BaseInput */
-  --dp-text-color: #0f172a;         /* slate-900 */
-  --dp-hover-color: #f1f5f9;        /* slate-100 */
-  --dp-hover-text-color: #0f172a;
-  --dp-hover-icon-color: #64748b;   /* slate-500 */
-  --dp-icon-color: #94a3b8;         /* slate-400 */
-  --dp-primary-color: #059669;      /* emerald-600 */
-  --dp-primary-disabled-color: #6ee7b7; /* emerald-300 */
-  --dp-secondary-color: #94a3b8;
-  --dp-border-color: #cbd5e1;       /* slate-300 */
-  --dp-menu-border-color: #cbd5e1;
-  --dp-border-color-hover: #94a3b8;
-  --dp-border-color-focus: #10b981; /* emerald-500 */
-  --dp-highlight-color: rgb(16 185 129 / 0.12);
-  --dp-success-color: #10b981;
+  --dp-text-color: var(--color-slate-900);
+  --dp-hover-color: var(--color-slate-100);
+  --dp-hover-text-color: var(--color-slate-900);
+  --dp-hover-icon-color: var(--color-slate-500);
+  --dp-icon-color: var(--color-slate-400);
+  --dp-primary-color: var(--color-emerald-600);
+  --dp-primary-disabled-color: var(--color-emerald-300);
+  --dp-secondary-color: var(--color-slate-400);
+  --dp-border-color: var(--color-slate-300);
+  --dp-menu-border-color: var(--color-slate-300);
+  --dp-border-color-hover: var(--color-slate-400);
+  --dp-border-color-focus: var(--color-emerald-500);
+  --dp-highlight-color: color-mix(in srgb, var(--color-emerald-500) 12%, transparent);
+  --dp-success-color: var(--color-emerald-500);
   --dp-danger-color: #ef4444;       /* red-500 */
   --dp-marker-color: #ef4444;
 }
 html .dp--theme-dark {
-  --dp-background-color: #0f172a;   /* slate-900 */
-  --dp-text-color: #f1f5f9;         /* slate-100 */
-  --dp-hover-color: #1e293b;        /* slate-800 */
-  --dp-hover-text-color: #f1f5f9;
-  --dp-hover-icon-color: #cbd5e1;   /* slate-300 */
-  --dp-icon-color: #64748b;         /* slate-500 */
-  --dp-primary-color: #059669;      /* emerald-600 */
-  --dp-primary-disabled-color: #065f46; /* emerald-800 */
-  --dp-secondary-color: #64748b;
-  --dp-border-color: #475569;       /* slate-600 */
-  --dp-menu-border-color: #334155;  /* slate-700 */
-  --dp-border-color-hover: #64748b;
-  --dp-border-color-focus: #10b981; /* emerald-500 */
-  --dp-highlight-color: rgb(16 185 129 / 0.2);
-  --dp-disabled-color: #1e293b;
-  --dp-disabled-color-text: #64748b;
-  --dp-scroll-bar-background: #0f172a;
-  --dp-scroll-bar-color: #334155;
-  --dp-success-color: #10b981;
+  --dp-background-color: var(--color-slate-900);
+  --dp-text-color: var(--color-slate-100);
+  --dp-hover-color: var(--color-slate-800);
+  --dp-hover-text-color: var(--color-slate-100);
+  --dp-hover-icon-color: var(--color-slate-300);
+  --dp-icon-color: var(--color-slate-500);
+  --dp-primary-color: var(--color-emerald-600);
+  --dp-primary-disabled-color: var(--color-emerald-800);
+  --dp-secondary-color: var(--color-slate-500);
+  --dp-border-color: var(--color-slate-600);
+  --dp-menu-border-color: var(--color-slate-700);
+  --dp-border-color-hover: var(--color-slate-500);
+  --dp-border-color-focus: var(--color-emerald-500);
+  --dp-highlight-color: color-mix(in srgb, var(--color-emerald-500) 20%, transparent);
+  --dp-disabled-color: var(--color-slate-800);
+  --dp-disabled-color-text: var(--color-slate-500);
+  --dp-scroll-bar-background: var(--color-slate-900);
+  --dp-scroll-bar-color: var(--color-slate-700);
+  --dp-success-color: var(--color-emerald-500);
   --dp-danger-color: #ef4444;
   --dp-marker-color: #ef4444;
-  --dp-tooltip-color: #1e293b;
+  --dp-tooltip-color: var(--color-slate-800);
 }
 
 /* BaseSelect: rounded, themed dropdown panel. Opt-in customizable <select>
@@ -161,7 +257,7 @@ html .dp--theme-dark {
   }
 
   .dark .base-select option:checked {
-    background-color: rgb(16 185 129 / 0.15);
+    background-color: color-mix(in srgb, var(--color-emerald-500) 15%, transparent);
     color: var(--color-emerald-300);
   }
 }

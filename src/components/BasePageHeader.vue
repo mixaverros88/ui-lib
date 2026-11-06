@@ -26,6 +26,8 @@
         'center' (default) or 'end' (actions sit on the title baseline).
       • marginClass — space under the header. Defaults to 'mb-8'; pass
         '' when the parent already manages vertical rhythm (space-y-*).
+      • accent — brand-green gauge bar in front of the title. Defaults to
+        on for icon-less headers; pass :accent="false" to opt out.
   -->
   <header :class="maxWidthClass ? ['mx-auto px-4 sm:px-6', maxWidthClass] : undefined">
     <!--
@@ -49,10 +51,10 @@
         <div>
           <h1
             class="text-2xl font-bold"
-            :class="[t.primaryTextSoft, accent ? 'relative pl-3.5 tracking-tight' : '']"
+            :class="[t.primaryTextSoft, showAccent ? 'relative pl-3.5 tracking-tight' : '']"
           >
             <span
-              v-if="accent"
+              v-if="showAccent"
               class="absolute left-0 top-[0.14em] h-[1.1em] w-1 rounded-full bg-gradient-to-b from-emerald-400 to-emerald-600"
               aria-hidden="true"
             />
@@ -71,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useSlots } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import { useThemeClasses } from '../composables/useThemeClasses'
 
@@ -85,7 +87,7 @@ const props = withDefaults(
     maxWidthClass?: string
     align?: 'center' | 'end'
     marginClass?: string
-    /** Brand-green gauge bar in front of the title (icon-less headers). */
+    /** Brand-green gauge bar in front of the title. Defaults to on when there is no icon. */
     accent?: boolean
   }>(),
   {
@@ -94,12 +96,16 @@ const props = withDefaults(
     maxWidthClass: 'max-w-4xl',
     align: 'center',
     marginClass: 'mb-8',
-    accent: false,
+    // Explicit undefined: an absent Boolean prop would otherwise cast to false.
+    accent: undefined,
   },
 )
 
 const { isDark } = useTheme()
 const t = useThemeClasses()
+const slots = useSlots()
+
+const showAccent = computed(() => props.accent ?? !slots.icon)
 
 // Maps the named colour palette to the badge-background classes for
 // dark/light themes. Callers just pass `iconColor="sky"` and the

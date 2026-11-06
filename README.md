@@ -1151,7 +1151,7 @@ so icon-less apps get a plain title/subtitle header.
 | `maxWidthClass` | `String` | `'max-w-4xl'` | Tailwind max-w utility constraining header width. Pass `''` to skip the width wrapper entirely — the header then spans its container. |
 | `align`         | `String` | `'center'`    | Vertical alignment of the title block vs the actions: `'center'` or `'end'` (actions sit on the title baseline). |
 | `marginClass`   | `String` | `'mb-8'`      | Space under the header. Pass `''` when the parent manages vertical rhythm (`space-y-*`). |
-| `accent`        | `Boolean` | `false`       | Brand-green gauge bar in front of the title (icon-less headers). |
+| `accent`        | `Boolean` | on when no `icon` slot | Brand-green gauge bar in front of the title. Pass `:accent="false"` to opt out. |
 
 **Slots:**
 
@@ -2050,6 +2050,16 @@ first paint:
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 ```
+
+## Design system
+
+`dist/style.css` ships the shared "Night Terminal" look, so importing it is all a
+consumer needs: remapped `gray`/`slate`/`emerald` colour ramps and `lg`/`xl`
+radii, Fira Sans / Fira Code, tabular numerals, an accent keyboard-focus outline
+and text selection, slim theme-aware scrollbars, and pointer cursors on buttons.
+
+The tokens are a plain, unlayered `:root` block, so they apply whatever the
+import order. To re-brand, add your own plain `:root` block after this stylesheet.
 
 ## Tailwind setup for consumers
 
