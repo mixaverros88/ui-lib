@@ -7,7 +7,14 @@
       :class="to ? 'hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500' : ''"
       :title="to ? profileLabel : undefined"
     >
+      <img
+        v-if="avatarUrl"
+        :src="avatarUrl"
+        alt=""
+        class="h-9 w-9 shrink-0 rounded-full object-cover"
+      />
       <span
+        v-else
         class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
         aria-hidden="true"
       >{{ initials }}</span>
@@ -47,6 +54,8 @@ import { BaseButtonSizeEnum } from '../enums/BaseButtonSizeEnum'
 interface Props {
   name: string
   email?: string
+  /** Photo shown instead of the initials. */
+  avatarUrl?: string | null
   /** Profile route; makes the name/email block a link. */
   to?: RouteLocationRaw
   showLogout?: boolean
@@ -56,6 +65,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   email: '',
+  avatarUrl: null,
   to: undefined,
   showLogout: true,
   logoutLabel: 'Logout',

@@ -31,16 +31,16 @@ const props = defineProps({
 })
 
 const colorMap: Record<string, string> = {
-  [ColorsEnums.RED]:    'bg-red-100 text-red-700 border-red-200',
-  [ColorsEnums.GREEN]:  'bg-green-100 text-green-700 border-green-200',
-  [ColorsEnums.BLUE]:   'bg-blue-100 text-blue-700 border-blue-200',
-  [ColorsEnums.YELLOW]: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-  [ColorsEnums.GRAY]:   'bg-gray-100 text-gray-700 border-gray-200',
+  [ColorsEnums.RED]:    'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/15 dark:text-red-300 dark:border-red-500/30',
+  [ColorsEnums.GREEN]:  'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/15 dark:text-green-300 dark:border-green-500/30',
+  [ColorsEnums.BLUE]:   'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/15 dark:text-blue-300 dark:border-blue-500/30',
+  [ColorsEnums.YELLOW]: 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-500/15 dark:text-yellow-300 dark:border-yellow-500/30',
+  [ColorsEnums.GRAY]:   'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-500/15 dark:text-gray-300 dark:border-gray-500/30',
   [ColorsEnums.BLACK]:  'bg-gray-800 text-gray-100 border-gray-700',
-  [ColorsEnums.NONE]:   'bg-gray-50 text-gray-600 border-gray-200',
+  [ColorsEnums.NONE]:   'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
 }
 
-const defaultColor = 'bg-red-100 text-red-700 border-red-200'
+const defaultColor = colorMap[ColorsEnums.RED]
 
 const badgeClasses = computed(() => {
   const colorClasses = (props.color && colorMap[props.color]) || defaultColor

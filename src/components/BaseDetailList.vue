@@ -3,6 +3,7 @@
     <div v-for="item in items" :key="item.label" class="min-w-0">
       <dt class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ item.label }}</dt>
       <dd class="mt-1 break-words text-sm text-slate-900 dark:text-slate-100" :class="item.mono ? 'font-mono' : ''">
+        <slot name="value" :item="item">
         <a
           v-if="item.href && !isEmpty(item.value)"
           :href="item.href"
@@ -12,6 +13,7 @@
         >{{ item.value }}</a>
         <span v-else-if="isEmpty(item.value)" class="text-slate-400 dark:text-slate-500">{{ emptyText }}</span>
         <template v-else>{{ item.value }}</template>
+        </slot>
       </dd>
     </div>
   </dl>
@@ -25,7 +27,8 @@
 /**
  * Read-only label/value grid for detail pages — the "view" counterpart of a
  * form. Empty values render `emptyText` (—); `href` makes the value an
- * external link; `mono` sets it in the monospace face (ids, hashes).
+ * external link; `mono` sets it in the monospace face (ids, hashes). The scoped
+ * `value` slot (`{ item }`) overrides how a value renders, e.g. a badge.
  */
 import type { DetailItem } from '../types/detail'
 

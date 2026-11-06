@@ -68,6 +68,13 @@ export { default as BaseSidebarUser } from './components/BaseSidebarUser.vue'
 export { default as BaseAuthLayout } from './components/BaseAuthLayout.vue'
 export { default as BaseBooleanBadge } from './components/BaseBooleanBadge.vue'
 export { default as BaseDetailList } from './components/BaseDetailList.vue'
+export { default as BaseTextarea } from './components/BaseTextarea.vue'
+export { default as BaseRating } from './components/BaseRating.vue'
+export { default as BaseRowButton } from './components/BaseRowButton.vue'
+export { default as BaseBooleanIcon } from './components/BaseBooleanIcon.vue'
+export { default as BasePhotoViewer } from './components/BasePhotoViewer.vue'
+export type { ViewerPhoto } from './types/photoViewer'
+export { useRefreshOnReturn, REFRESH_AFTER_AWAY_MS } from './composables/useRefreshOnReturn'
 export type { DetailItem } from './types/detail'
 
 // Composables
@@ -149,6 +156,9 @@ export {
   fmtCurrencyAmount,
   fmtDuration,
   formatJson,
+  fmtTime,
+  toLocalInput,
+  fromLocalInput,
   stringifyValue,
 } from './utils/format'
 export {

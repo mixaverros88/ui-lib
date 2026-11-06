@@ -1,8 +1,8 @@
 <template>
-  <div :class="grow ? 'min-w-48 flex-1' : ''" class="text-left">
+  <div ref="root" :class="grow ? 'min-w-48 flex-1' : ''" class="text-left">
     <label
       v-if="label"
-      :for="labelFor || undefined"
+      :for="labelFor || autoFor"
       class="mb-1 block"
       :class="compact
         ? 'text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400'
@@ -17,6 +17,8 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref, useId } from 'vue'
+
 /**
  * Label + control + message wrapper for forms and filter bars. The control
  * goes in the default slot (BaseInput, BaseSelect, BaseSearchSelect, …).
@@ -35,7 +37,7 @@ interface Props {
   grow?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   label: '',
   labelFor: '',
   required: false,
@@ -43,5 +45,19 @@ withDefaults(defineProps<Props>(), {
   hint: '',
   compact: false,
   grow: false,
+})
+
+// Without labelFor, link the label to the control in the slot so clicking it
+// focuses the field and screen readers announce it.
+const root = ref<HTMLElement>()
+const autoFor = ref<string>()
+const generatedId = useId()
+
+onMounted(() => {
+  if (props.labelFor || !props.label) return
+  const control = root.value?.querySelector<HTMLElement>('input, select, textarea')
+  if (!control) return
+  control.id ||= generatedId
+  autoFor.value = control.id
 })
 </script>

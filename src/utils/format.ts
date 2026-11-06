@@ -281,3 +281,26 @@ export function fmtDuration(ms: number | null | undefined, maxUnits = 2): string
   parts.push(`${mins}m`)
   return parts.slice(0, maxUnits).join(' ')
 }
+
+/**
+ * Normalize a backend time string for display: "11:00:00" → "11:00".
+ * Leaves already-short ("11:00") or unexpected values untouched.
+ */
+export function fmtTime(time?: string | null): string {
+  if (!time) return '—'
+  const match = /^(\d{2}:\d{2})(?::\d{2}(?:\.\d+)?)?$/.exec(time)
+  return match ? match[1] : time
+}
+
+/** ISO instant → "YYYY-MM-DDTHH:mm" in the browser's time zone, for <input type="datetime-local">. */
+export function toLocalInput(iso?: string | null): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+/** Value of an <input type="datetime-local"> → ISO instant (null when empty). */
+export function fromLocalInput(value: string): string | null {
+  return value ? new Date(value).toISOString() : null
+}

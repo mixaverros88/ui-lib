@@ -320,3 +320,23 @@ describe('fmtCurrencyAmount', () => {
     expect(fmtCurrencyAmount(undefined, 'BTC')).toBe('—')
   })
 })
+
+describe('fmtTime', () => {
+  it('drops seconds and keeps unexpected values', async () => {
+    const { fmtTime } = await import('./format')
+    expect(fmtTime('11:00:00')).toBe('11:00')
+    expect(fmtTime('11:00')).toBe('11:00')
+    expect(fmtTime('soon')).toBe('soon')
+    expect(fmtTime(null)).toBe('—')
+  })
+})
+
+describe('datetime-local helpers', () => {
+  it('round-trips a minute-precision instant', async () => {
+    const { toLocalInput, fromLocalInput } = await import('./format')
+    const iso = '2026-11-06T10:30:00.000Z'
+    expect(fromLocalInput(toLocalInput(iso))).toBe(iso)
+    expect(toLocalInput(null)).toBe('')
+    expect(fromLocalInput('')).toBeNull()
+  })
+})

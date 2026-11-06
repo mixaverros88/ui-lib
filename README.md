@@ -2051,6 +2051,23 @@ first paint:
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 ```
 
+## Added in 1.49.0
+
+| Export | Purpose |
+| --- | --- |
+| `BaseTextarea` | Multi-line input with BaseInput's skin. |
+| `BaseRating` | Read-only star rating: `rating`, optional `count`. |
+| `BaseRowButton` | Compact table-row action: `variant` `outline` / `primary` / `danger`. |
+| `BaseBooleanIcon` | Icon-only yes/no flag; label in the tooltip. |
+| `BasePhotoViewer` | Full-screen viewer: `photos`, `v-model` index, `@close`; `closeLabel`, `previousLabel`, `nextLabel`. |
+| `useRefreshOnReturn(fn, afterMs?)` | Re-runs `fn` when the tab returns after being hidden (default 30s). |
+| `fmtTime`, `toLocalInput`, `fromLocalInput` | Backend time and `datetime-local` helpers. |
+
+Existing components gained: `BaseSelect` `icon` slot and numeric `modelValue`,
+`BaseStatCard` `value` slot and `violet` accent, `BaseDetailList` scoped `value`
+slot, `BaseSidebarUser` `avatarUrl`, dark-mode colours on `BaseBadge`. `BaseField`
+links its label to the slotted control automatically when `labelFor` is not set.
+
 ## Design system
 
 `dist/style.css` ships the shared "Night Terminal" look, so importing it is all a

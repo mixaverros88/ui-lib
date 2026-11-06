@@ -4,11 +4,13 @@
       v-bind="$attrs"
       :value="modelValue"
       class="base-select w-full appearance-none bg-none rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm cursor-pointer transition-colors hover:border-slate-400 dark:hover:border-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 focus-visible:border-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed"
-      :class="size === 'md' ? 'py-2 pl-3 pr-9' : 'py-1.5 pl-2.5 pr-8'"
+      :class="[size === 'md' ? 'py-2 pr-9' : 'py-1.5 pr-8', $slots.icon ? 'pl-8' : size === 'md' ? 'pl-3' : 'pl-2.5']"
       @change="onChange"
     >
       <SlotContent />
     </select>
+    <!-- Optional leading icon: pass a Heroicon and bind `iconClass`. -->
+    <slot name="icon" icon-class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
     <ChevronDownIcon
       class="pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-slate-400"
       :class="size === 'md' ? 'right-3' : 'right-2.5'"
@@ -40,7 +42,7 @@ defineOptions({ inheritAttrs: false })
 // declarations) so `v-model` on a union-typed ref ('7D' | '30D' | …)
 // type-checks; the actual payload is always the selected option's string.
 interface Props {
-  modelValue?: string | null
+  modelValue?: string | number | null
   /** 'sm' = px-2 py-1.5 (default, the usual select height); 'md' = px-3 py-2. */
   size?: 'sm' | 'md'
   /** Full-width (w-full). Set false for inline selects. */

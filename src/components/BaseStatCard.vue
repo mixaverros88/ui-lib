@@ -11,7 +11,7 @@
           {{ title }}
         </p>
         <p class="mt-1 truncate text-3xl font-bold" :class="cls.value">
-          {{ value }}
+          <slot name="value">{{ value }}</slot>
         </p>
         <p v-if="subtitle" class="mt-1 text-sm font-medium" :class="cls.subtitle">
           {{ subtitle }}
@@ -35,13 +35,14 @@
  * bold title, big value, accent subtitle, tinted icon chip) but for any
  * value — counts, labels, pre-formatted numbers. Pass `to` to make the whole
  * card a router link. The `icon` slot fills the chip (receives `iconClass`);
- * the `default` slot adds extra content under the subtitle.
+ * the `value` slot replaces the value text (e.g. <EuroAmount>); the `default`
+ * slot adds extra content under the subtitle.
  *
  */
 import { computed } from 'vue'
 import { RouterLink, type RouteLocationRaw } from 'vue-router'
 
-type Accent = 'emerald' | 'sky' | 'amber' | 'red' | 'slate'
+type Accent = 'emerald' | 'sky' | 'amber' | 'violet' | 'red' | 'slate'
 
 interface Props {
   title: string
@@ -68,6 +69,13 @@ const ACCENTS: Record<Accent, { border: string; value: string; subtitle: string;
     subtitle: 'text-emerald-500 dark:text-emerald-400',
     iconBox: 'bg-emerald-50 dark:bg-emerald-900/30',
     icon: 'text-emerald-500',
+  },
+  violet: {
+    border: 'border-violet-300 dark:border-violet-700',
+    value: 'text-violet-500 dark:text-violet-400',
+    subtitle: 'text-violet-500 dark:text-violet-400',
+    iconBox: 'bg-violet-50 dark:bg-violet-900/30',
+    icon: 'text-violet-500',
   },
   sky: {
     border: 'border-sky-300 dark:border-sky-700',
