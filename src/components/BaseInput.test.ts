@@ -37,4 +37,9 @@ describe('BaseInput', () => {
     expect(input.classes()).toContain('font-mono')
     expect(input.attributes('type')).toBe('number')
   })
+
+  it.each(['date', 'time', 'datetime-local', 'month', 'week'])('refuses the native %s type', (type) => {
+    // Cast: the point is the runtime guard for clients built without vue-tsc.
+    expect(() => mount(BaseInput, { props: { type: type as 'text' } })).toThrow('BaseDateTimePicker')
+  })
 })

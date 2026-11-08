@@ -1,6 +1,6 @@
 {
   "name": "mgv-backoffice",
-  "version": "1.49.0",
+  "version": "1.50.0",
   "description": "Shared Vue 3 UI component library",
   "type": "module",
   "main": "./dist/ui-lib.umd.cjs",
@@ -16,11 +16,15 @@
     "./tailwind.safelist": "./tailwind.safelist.js",
     "./tailwind.safelist.css": "./tailwind.safelist.css"
   },
+  "bin": {
+    "mgv-check-date-inputs": "./scripts/check-date-inputs.mjs"
+  },
   "files": [
     "dist",
     "src",
     "tailwind.safelist.js",
-    "tailwind.safelist.css"
+    "tailwind.safelist.css",
+    "scripts/check-date-inputs.mjs"
   ],
   "scripts": {
     "safelist": "node scripts/generate-safelist.mjs",

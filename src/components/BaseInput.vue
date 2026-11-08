@@ -18,17 +18,24 @@
 </template>
 
 <script setup lang="ts">
+import { watch } from 'vue'
+
+/** Date and time types are left out on purpose: those go through BaseDateTimePicker. */
+export type BaseInputType = 'text' | 'number' | 'password' | 'email' | 'tel' | 'url' | 'search'
+
+const NATIVE_DATE_TYPES = ['date', 'time', 'datetime-local', 'month', 'week']
+
 interface Props {
   modelValue?: string | number | null
-  /** Native input type ('text', 'number', 'password', …). */
-  type?: string
+  /** Native input type. */
+  type?: BaseInputType
   /** 'md' = px-3 py-2 (default); 'sm' = px-2 py-1.5 compact. */
   size?: 'sm' | 'md'
   /** Full-width (w-full). Set false for inline fields. */
   block?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   type: 'text',
   size: 'md',
@@ -39,6 +46,17 @@ const emit = defineEmits<{
   /** Raw string value on every input — callers parse numbers themselves. */
   (e: 'update:modelValue', value: string): void
 }>()
+
+// Clients built without vue-tsc never see the narrowed prop type, so refuse at runtime too.
+watch(
+  () => props.type,
+  (type) => {
+    if (NATIVE_DATE_TYPES.includes(type)) {
+      throw new Error(`BaseInput does not support type="${type}", use BaseDateTimePicker`)
+    }
+  },
+  { immediate: true },
+)
 
 function onInput(e: Event) {
   emit('update:modelValue', (e.target as HTMLInputElement).value)

@@ -1429,7 +1429,7 @@ Themed text/number input carrying the shared field skin (slate border,
 | Prop         | Type               | Default  | Description |
 | ------------ | ------------------ | -------- | ----------- |
 | `modelValue` | `String \| Number \| null` | `''`     | `v-model` value. |
-| `type`       | `String`           | `'text'` | Native input type. |
+| `type`       | `BaseInputType`    | `'text'` | `text`, `number`, `password`, `email`, `tel`, `url` or `search`. Date and time types are refused (compile error, and a runtime throw): use `BaseDateTimePicker`. |
 | `size`       | `String`           | `'md'`   | `'md'` = `px-3 py-2`, `'sm'` = `px-2 py-1.5`. |
 | `block`      | `Boolean`          | `true`   | Full-width (`w-full`); set `false` for inline fields. |
 
@@ -1506,6 +1506,14 @@ Date / date-time / time picker built on
 dependency of this lib (installed automatically) and its CSS ships inside
 `ui-lib.css`, so consumers install and import nothing extra. Dark mode follows
 `useTheme()`; the skin matches BaseInput (slate surfaces, emerald accent).
+
+This is the only date/time input clients should use. To stop a raw
+`<input type="date">` slipping in as well, run the lib's check before each build
+(it scans `src`, and works with Vite and vue-cli alike):
+
+```json
+"prebuild": "mgv-check-date-inputs"
+```
 
 **Props:**
 
