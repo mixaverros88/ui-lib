@@ -41,6 +41,7 @@ export { default as BaseCodeBlock } from './components/BaseCodeBlock.vue'
 
 // Components — extracted from TradeAutomation
 export { default as BaseInput } from './components/BaseInput.vue'
+export type { BaseInputType } from './components/BaseInput.vue'
 export { default as BaseSelect } from './components/BaseSelect.vue'
 export { default as BaseDropdown } from './components/BaseDropdown.vue'
 export { default as BaseSegmentedControl } from './components/BaseSegmentedControl.vue'
